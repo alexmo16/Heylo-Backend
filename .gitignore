@@ -1,2 +1,3 @@
 server/server.code-workspace
 server/Heylo/node_modules
+server/Heylo/sslcert
