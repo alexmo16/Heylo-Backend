@@ -1,0 +1,21 @@
+{
+  "name": "heylo",
+  "description": "backend server of Heylo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node ./bin/www",
+    "start": "node_modules/.bin/nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "install": "^0.12.2",
+    "morgan": "~1.9.0",
+    "npm": "^6.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}
