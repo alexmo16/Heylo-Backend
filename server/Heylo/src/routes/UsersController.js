@@ -6,7 +6,7 @@ router.all('/users', validator);
 
 /* GET users listing. */
 router.get('/users', function(req, res, next) {
-  res.send('respond with a resource');
+  res.send('test');
 });
 
 module.exports = router;

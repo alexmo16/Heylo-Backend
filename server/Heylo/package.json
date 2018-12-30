@@ -4,14 +4,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node ./bin/www",
+    "build": "node ./bin/www production=true",
     "start": "node_modules/.bin/nodemon ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "dotenv": "^6.2.0",
     "express": "~4.16.0",
     "fs": "0.0.1-security",
+    "google-auth-library": "^2.0.2",
     "install": "^0.12.2",
     "morgan": "~1.9.0",
     "npm": "^6.5.0",
