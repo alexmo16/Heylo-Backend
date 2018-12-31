@@ -3,6 +3,10 @@ const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client(process.env.CLIENT_ID);
 
 let validator = function(req, res, next) {
+    if (req.path === '/register') {
+        return next();
+    }
+
     let uToken = req.headers.g_token;
     async function verify() {
         const ticket = await client.verifyIdToken({
@@ -20,7 +24,7 @@ let validator = function(req, res, next) {
     }
     verify().catch(function (error) {
         console.error;
-        return res.sendStatus(403);
+        return res.sendStatus(401);
     });
 };
 

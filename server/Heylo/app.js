@@ -6,6 +6,7 @@ let logger = require('morgan');
 let indexController = require('./src/routes/IndexController');
 let usersController = require('./src/routes/UsersController');
 let loginController = require('./src/routes/LoginController');
+let registerController = require('./src/routes/RegisterController');
 
 let app = express();
 
@@ -17,5 +18,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(indexController);
 app.use(usersController);
 app.use(loginController);
+app.use(registerController);
 
 module.exports = app;

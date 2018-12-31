@@ -21,10 +21,10 @@
         };
 
         axios
-        .get("/users", options)
+        .post("/register", options)
         .then(response => {
           if (response && response.data) {
-            console.log(response);
+            console.log(response.data);
           } else {
             throw new Error(":(");
           }
