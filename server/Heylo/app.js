@@ -4,10 +4,10 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let helmet = require('helmet');
 
-let indexController = require('./src/routes/IndexController');
-let usersController = require('./src/routes/UsersController');
-let loginController = require('./src/routes/LoginController');
-let registerController = require('./src/routes/RegisterController');
+let indexController = require('./src/controllers/IndexController');
+let userController = require('./src/controllers/UserController');
+let loginController = require('./src/controllers/LoginController');
+let registerController = require('./src/controllers/RegisterController');
 
 let app = express();
 
@@ -24,7 +24,7 @@ app.use(helmet({
 }));
 
 app.use(indexController);
-app.use(usersController);
+app.use(userController);
 app.use(loginController);
 app.use(registerController);
 

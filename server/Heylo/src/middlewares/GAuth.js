@@ -1,16 +1,11 @@
 const {OAuth2Client} = require('google-auth-library');
 
-const client = new OAuth2Client(process.env.CLIENT_ID);
+const client = new OAuth2Client(process.env.CLIENT_ID, process.env.SECRET_ID);
 
-let validator = function(req, res, next) {
-    if (req.path === '/register') {
-        return next();
-    }
-
-    let uToken = req.headers.g_token;
-    async function verify() {
+class GAuth {
+    static async verify(token, next) {
         const ticket = await client.verifyIdToken({
-            idToken: uToken,
+            idToken: token,
             audience: process.env.CLIENT_ID,
             // Or, if multiple clients access the backend:
             //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
@@ -22,10 +17,11 @@ let validator = function(req, res, next) {
             return next();
         }
     }
-    verify().catch(function (error) {
-        console.error;
-        return res.sendStatus(401);
-    });
-};
 
-module.exports = validator;
+    static async getUserInfo(token, next) {
+        const userInfo = await client.getTokenInfo(token);
+        return next(null, userInfo);
+    }
+}
+
+module.exports = GAuth;
