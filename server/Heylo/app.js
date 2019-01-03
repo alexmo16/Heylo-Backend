@@ -3,6 +3,7 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let helmet = require('helmet');
+let mongoose = require('mongoose');
 
 let indexController = require('./src/controllers/IndexController');
 let userController = require('./src/controllers/UserController');
@@ -22,6 +23,14 @@ app.use(helmet({
       action: 'deny'
     }
 }));
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true
+});
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use(indexController);
 app.use(userController);
