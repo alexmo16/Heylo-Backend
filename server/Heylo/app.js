@@ -2,6 +2,7 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
+let helmet = require('helmet');
 
 let indexController = require('./src/routes/IndexController');
 let usersController = require('./src/routes/UsersController');
@@ -15,6 +16,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(helmet({
+    frameguard: {
+      action: 'deny'
+    }
+}));
+
 app.use(indexController);
 app.use(usersController);
 app.use(loginController);
