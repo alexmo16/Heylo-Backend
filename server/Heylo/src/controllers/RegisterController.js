@@ -3,7 +3,7 @@ let router = express.Router();
 
 let validator = require('../middlewares/Validator');
 let gAuth = require('../middlewares/GAuth');
-const User = require('./UserController');
+let userModel = require('../models/UserModel');
 
 // get register page
 router.get('/register', function(req, res, next) {
@@ -12,20 +12,35 @@ router.get('/register', function(req, res, next) {
 
 // create a new user
 router.post('/register', validator, function(req, res, next) {
-    gAuth.getUserInfo(req.headers.g_token, function(err, userInfo) {
-        if (err) {
-            res.status(500).json(err);
-            return;
+    if (!req.body.username) res.sendStatus(400);
+    if (!req.headers.g_token || !req.user_payload) res.sendStatus(500);
+    let userInfo = req.user_payload;
+    if (!userInfo.family_name || !userInfo.given_name || !userInfo.sub) res.status(500).json(`unable to get user's informations.`);
+
+    let userData = {
+        username: req.body.username,
+        firstname: userInfo.given_name,
+        lastname: userInfo.family_name,
+        user_id: userInfo.sub
+    };
+    let newUser = new userModel(userData);
+    newUser.save(function(err) {
+        console.log(err);
+        if (err)  {
+            if (err.code === 11000) {
+                res.status(409).json('this user already exist.');
+            } else {
+                res.sendStatus(500);
+            }
         }
-        let newUser = new User('test', 'admin', 'admin');
-        res.sendStatus(202);
-                    // res.status(202).json({
-                    //     username: newUser.getUsername(),
-                    //     firstName: newUser.getFirstName(),
-                    //     lastName: newUser.getLastName()
-                    // });
-        //res.status(409).json(`user ${newUser.getFirstName()} ${newUser.getLastName()} with username ${newUser.getUsername()} already exist.`);
-    });
+
+        return res.status(202).json({
+            username: newUser.username,
+            firstName: newUser.firstname,
+            lastName: newUser.lastname,
+            creation_date: newUser.creation_date
+        });
+    });    
 });
 
 module.exports = router;

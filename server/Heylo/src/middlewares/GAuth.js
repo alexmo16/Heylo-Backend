@@ -12,15 +12,14 @@ class GAuth {
         });
         const payload = ticket.getPayload();
         const userid = payload['sub'];
-
         if (ticket && payload && userid) {
-            return next();
+            return next(payload);
         }
     }
 
-    static async getUserInfo(token, next) {
-        const userInfo = await client.getTokenInfo(token);
-        return next(null, userInfo);
+    static async getTokenInfo(token, next) {
+        const tokenInfo = await client.getTokenInfo(token);
+        return next(null, tokenInfo);
     }
 }
 

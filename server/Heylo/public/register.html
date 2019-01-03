@@ -21,7 +21,7 @@
         };
 
         axios
-        .post("/register", {}, options)
+        .post("/register", {username: 'Admin'}, options)
         .then(response => {
           if (response && response.data) {
             console.log(response.data);
