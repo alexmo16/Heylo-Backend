@@ -1,6 +1,4 @@
-const {OAuth2Client} = require('google-auth-library');
 let GAuth = require('./GAuth');
-const client = new OAuth2Client(process.env.CLIENT_ID, process.env.SECRET_ID);
 
 let validator = function(req, res, next) {
     let uToken = req.headers.g_token;
