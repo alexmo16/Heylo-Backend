@@ -26,7 +26,7 @@ router.post('/register', validator, function(req, res, next) {
     newUser.save(function(err) {
         if (err)  {
             if (err.code === 11000) {
-                return res.status(409).json('this user already exist.');
+                return res.status(409).json('this user already exists');
             } else {
                 return res.sendStatus(500);
             }

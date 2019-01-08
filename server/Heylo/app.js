@@ -6,9 +6,10 @@ let helmet = require('helmet');
 let mongoose = require('mongoose');
 
 let indexController = require('./src/controllers/IndexController');
-let userController = require('./src/controllers/UserController');
+let usersController = require('./src/controllers/UsersController');
 let loginController = require('./src/controllers/LoginController');
 let registerController = require('./src/controllers/RegisterController');
+let chatController = require('./src/controllers/ChatController');
 
 let app = express();
 
@@ -33,8 +34,9 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use(indexController);
-app.use(userController);
+app.use(usersController);
 app.use(loginController);
 app.use(registerController);
+app.use(chatController);
 
 module.exports = app;
