@@ -1,5 +1,7 @@
 let mongoose = require('mongoose');
 let idValidator = require('mongoose-id-validator');
+let async = require('async');
+
 let UserModel = require('./UserModel');
 
 let Schema = mongoose.Schema;
@@ -19,23 +21,36 @@ let ChatSchema = new Schema({
     }
 });
 
-ChatSchema.pre('save', function(next) {
-    if (!this.name) {
-        let that = this;
-        this.users_ids.forEach(function(userId) {
-            UserModel.findById(userId, function(err, user) {
-                if (err) return next(err);
-                
-                if (user) {
-                    that.name += `${user.username} `;
-                }
-            });
-        });
-    }
-    next();
-});
-
 ChatSchema.plugin(idValidator);
+
+ChatSchema.pre('save', function(next) {
+    let chat = this;
+    if (!chat.name) {
+        async.waterfall([
+            function(cb) {
+                chat.users_ids.forEach(function(userId) {
+                    cb(null, userId);
+                });
+            },
+
+            function(userId, cb) {
+                UserModel.findById(userId, function(err, user) {
+                    if (err) return cb(err);
+
+                    if (user) {
+                        chat.name += `${user.username} `;
+                    }
+                    cb(err); // err is null at this point
+                });
+            }
+
+        ], function(err) {
+            return next(err);
+        });
+    } else {
+        return next();
+    }
+});
 
 let ChatModel = mongoose.model('chat', ChatSchema);
 module.exports = ChatModel;

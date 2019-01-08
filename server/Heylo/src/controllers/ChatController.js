@@ -12,7 +12,9 @@ router.get('/chat', function(req, res, next) {
     if (!req.query.id) return res.sendStatus(400);
 
     chatModel.findById(req.query.id, function(err, chat) {
-        if (err) return res.sendStatus(500);
+        if (err) return next(err);
+        
+        if (!chat) return res.sendStatus(404);
 
         return res.status(200).json({
             name: chat.name,
