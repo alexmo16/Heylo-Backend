@@ -25,7 +25,8 @@ router.get('/chat', function(req, res, next) {
 });
 
 router.post('/chat', function(req, res, next) {
-    if (!req.body.usersId) return res.sendStatus(400);
+    if (!req.body.usersId || !Array.isArray(req.body.usersId)) return res.sendStatus(400);
+    if (req.body.roomName && !req.body.roomName instanceof String) return res.sendStatus(400);
 
     let usersObjectId = [];
     req.body.usersId.forEach(function(userId) {
