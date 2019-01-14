@@ -9,7 +9,7 @@ let indexController = require('./src/controllers/IndexController');
 let usersController = require('./src/controllers/UsersController');
 let loginController = require('./src/controllers/LoginController');
 let registerController = require('./src/controllers/RegisterController');
-let chatController = require('./src/controllers/ChatController');
+let userChatController = require('./src/controllers/UserChatController');
 
 let app = express();
 
@@ -37,6 +37,6 @@ app.use(indexController);
 app.use(usersController);
 app.use(loginController);
 app.use(registerController);
-app.use(chatController);
+app.use(userChatController);
 
 module.exports = app;
