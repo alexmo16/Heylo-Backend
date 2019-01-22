@@ -4,7 +4,8 @@ let idValidator = require('mongoose-id-validator');
 let Schema = mongoose.Schema;
 let ChatSchema = new Schema({
     name: {
-        type: String
+        type: String,
+        default: ''
     },
     users_ids: [{
         type: mongoose.Schema.Types.ObjectId,

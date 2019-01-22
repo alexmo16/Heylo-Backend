@@ -22,7 +22,7 @@ router.get('/user/chats', function(req, res, next) {
         };
         chatModel.find(data, function(err, chats) {
             if (err) return next(err);
-            console.log(chats);
+
             return res.status(200).json(chats);
         }).select('-__v -creation_date');
     });
