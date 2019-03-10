@@ -4,7 +4,7 @@
 
 1. Install latest stable nodejs version.
 
-2. Install mongodb commutnity edition.
+2. Install mongodb community edition.
 
 3. Install compass (the UI tool for mongodb).
 
