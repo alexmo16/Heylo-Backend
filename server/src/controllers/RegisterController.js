@@ -4,11 +4,6 @@ let router = express.Router();
 let validator = require('../middlewares/Validator');
 let userModel = require('../models/UserModel');
 
-// get register page
-router.get('/register', function(req, res, next) {
-    res.sendFile('C:/Users/Morel/Documents/dev/Heylo/server/Heylo/public/register.html');
-});
-
 // create a new user
 router.post('/register', validator, function(req, res, next) {
     if (!req.body.username) return res.sendStatus(400);

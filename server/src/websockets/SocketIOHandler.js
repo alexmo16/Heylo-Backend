@@ -1,46 +1,26 @@
 let chatModel = require('../models/ChatModel');
 
-class websocketHandler {
+module.exports = class SocketIOHandler {
     // TO-DO restructure the code for socket IO
 
     constructor(io) {
-        this.io = io;
         this.connections = [];
 
         let that = this;
         io.on('connection', function(socket) {
-            let connection = request.accept('echo-protocol', request.origin);
-            let connectionIndex = that.connections.push(connection) - 1;
+            let connectionIndex = that.connections.push(socket) - 1;
             process.stdout.write(`${new Date()} Connection accepted.\n`);
 
-            connection.on('disconnect', function() {
-                process.stdout.write(`${new Date()} Peer disconnected.`);
+            socket.on('disconnect', function() {
+                process.stdout.write(`${new Date()} Peer disconnected.\n`);
                 that.connections.splice(connectionIndex, 1);
             });
 
             // user sent some message
-            connection.on('message', function(message) {
-                if (message.type === 'utf8') { // accept only text
-                    let receivedObject = JSON.parse(message.utf8Data);
-
-                    if (this.isJsonString(receivedObject)) {
-
-                        let chatId = receivedObject.chatId;
-                        chatModel.findById(chatId, function(err, chat) {
-                            if (err) return connection.close();
-                        
-                            if (chat) {
-                                process.stdout.write(chat.users_ids);
-
-                                // broadcast message to all connected clients
-                                let json = JSON.stringify();
-                                that.connections.forEach(function (clientConnection) {
-                                    clientConnection.sendUTF(json);
-                                });
-                            }
-                        });
-                    }
-                }
+            socket.on('message', function(message) {
+                that.connections.forEach(function (clientConnection) {
+                    clientConnection.emit('message', message);
+                });
             });
         });
     }
@@ -54,5 +34,3 @@ class websocketHandler {
         }
     }
 }
-
-module.exports = websocketHandler;
