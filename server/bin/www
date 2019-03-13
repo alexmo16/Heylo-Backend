@@ -106,3 +106,4 @@ function onListening() {
 
 let io = require('socket.io')(server);
 new socketIOHandler(io);
+process.stdout.write('server is ready...\n');
