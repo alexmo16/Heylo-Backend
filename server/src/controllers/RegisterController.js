@@ -2,7 +2,7 @@ let express = require('express');
 let router = express.Router();
 
 let validator = require('../middlewares/Validator');
-let userModel = require('../models/UserModel');
+let users = require('../services/users/users');
 
 // create a new user
 router.post('/register', validator, function(req, res, next) {
@@ -17,13 +17,14 @@ router.post('/register', validator, function(req, res, next) {
         lastname: userInfo.family_name,
         user_id: userInfo.sub
     };
-    let newUser = new userModel(userData);
-    newUser.save(function(err) {
+
+    users.createUser(userData, function(err, newUser) {
         if (err)  {
-            if (err.code === 11000) {
-                return res.status(409).json('this user already exists');
+            if (err.code === 409) {
+                return res.status(err.code).json('this user already exists');
             } else {
-                return res.sendStatus(500);
+                next(err);
+                return;
             }
         }
 
@@ -33,7 +34,7 @@ router.post('/register', validator, function(req, res, next) {
             lastName: newUser.lastname,
             creation_date: newUser.creation_date
         });
-    });    
+    });
 });
 
 module.exports = router;
