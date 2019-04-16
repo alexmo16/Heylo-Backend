@@ -17,6 +17,21 @@ module.exports = class ChatRoom {
         });
     }
 
+    static findUserChats(userID, next) {
+        let data = {
+            users_ids: { '$in': [userID] }
+        };
+
+        chatModel.find(data, function(err, chats) {
+            if (err) {
+                next(err);
+                return;
+            }
+
+            next(err, chats);
+        }).select('-__v -creation_date');
+    }
+
     static createChatRoom(usersObjectID, roomName, next) {
         let chatData = {
             users_ids: usersObjectID,
