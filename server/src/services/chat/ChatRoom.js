@@ -4,21 +4,6 @@ module.exports = class ChatRoom {
     constructor() {
     }
 
-    static findUserChats(userID, next) {
-        let data = {
-            users_ids: { '$in': [userID] }
-        };
-
-        chatModel.find(data, function(err, chats) {
-            if (err) {
-                next(err);
-                return;
-            }
-
-            next(err, chats);
-        }).select('-__v -creation_date');
-    }
-
     static findChatRoom(usersObjectID, next) {
         chatModel.findOne({
             users_ids: usersObjectID
@@ -55,6 +40,25 @@ module.exports = class ChatRoom {
 
                 next(err, chat);
             });
+        });
+    }
+
+    static isUserInRoom(userID, roomID, next) {
+        let query = {
+            _id: roomID,
+            users_ids: {
+                $in: userID
+            }
+        };
+        
+        chatModel.find(query, function(err, chat) {
+            if (err) {
+                next(err, null)
+                return;
+            }
+            
+            let isInRoom = chat && chat.length !== 0;
+            next(err, isInRoom);
         });
     }
 };

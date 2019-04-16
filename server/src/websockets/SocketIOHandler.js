@@ -1,4 +1,4 @@
-let chatModel = require('../models/ChatModel');
+let chatroom = require('../services/chat/ChatRoom');
 
 module.exports = class SocketIOHandler {
     // TO-DO restructure the code for socket IO
@@ -14,6 +14,24 @@ module.exports = class SocketIOHandler {
             socket.on('disconnect', function() {
                 process.stdout.write(`${new Date()} Peer disconnected.\n`);
                 that.connections.splice(connectionIndex, 1);
+            });
+
+            socket.on('join', function(data, next) {
+                chatroom.isUserInRoom(data.userID, data.room, function(err, isInRoom) {
+                    if (err) {
+                        next(JSON.stringify(err));
+                        return;
+                    }
+
+                    if (!isInRoom) {
+                        err = new Error('This user is not allowed to join this room.');
+                        next(JSON.stringify(err));
+                        return;
+                    }
+                    
+                    socket.join(data.room);
+                    next();
+                });
             });
 
             // user sent some message

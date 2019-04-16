@@ -61,4 +61,19 @@ module.exports = class UserChat {
             });
         });
     }
+
+    static findUserChats(userID, next) {
+        let data = {
+            users_ids: { '$in': [userID] }
+        };
+
+        chatModel.find(data, function(err, chats) {
+            if (err) {
+                next(err);
+                return;
+            }
+
+            next(err, chats);
+        }).select('-__v -creation_date');
+    }
 };

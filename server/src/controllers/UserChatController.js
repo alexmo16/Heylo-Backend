@@ -23,7 +23,7 @@ router.get('/user/chats', function(req, res, next) {
             return;
         }
 
-        chatroom.findUserChats(user._id, function(err, chats) {
+        userChat.findUserChats(user._id, function(err, chats) {
             if (err) {
                 next(err);
                 return;

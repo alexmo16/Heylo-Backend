@@ -29,9 +29,20 @@
           $('#m').val('');
           return false;
         });
-        socket.on('message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
+        
+        var data = {
+          room: '5cb50efd5b085f2f64984c41',
+          userID: '5cb10b749572801d6807abe2'
+        };
+        socket.emit('join', data, function(err) {
+          if (err) {
+            console.log(err);
+          } else {
+            socket.on('message', function(msg){
+              $('#messages').append($('<li>').text(msg));
+              window.scrollTo(0, document.body.scrollHeight);
+            });
+          }
         });
       });
     </script>
