@@ -3,16 +3,12 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let helmet = require('helmet');
-let mongoose = require('mongoose');
 
-let indexController = require('./src/controllers/IndexController');
-let usersController = require('./src/controllers/UsersController');
-let loginController = require('./src/controllers/LoginController');
-let registerController = require('./src/controllers/RegisterController');
-let userChatController = require('./src/controllers/UserChatController');
-
+let db = require('./db');
+let routes = require('./routes');
 let app = express();
 
+// Third-party modules for our server.
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -25,18 +21,7 @@ app.use(helmet({
     }
 }));
 
-mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useCreateIndex: true
-});
-var db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-app.use(indexController);
-app.use(usersController);
-app.use(loginController);
-app.use(registerController);
-app.use(userChatController);
+// Connect all our routes to our application.
+routes(app);
 
 module.exports = app;

@@ -2,7 +2,7 @@ let express = require('express');
 let validator = require('../middlewares/Validator');
 let router = express.Router();
 
-let usersModel = require('../models/UserModel');
+let users = require('../services/users/users');
 
 router.all('/users', validator);
 
@@ -11,18 +11,15 @@ router.get('/users', function(req, res, next) {
 
     let top = req.query.username;
     let triedUsername = req.query.username;
-    let data = {
-        username: new RegExp(triedUsername, 'i')
-    };
 
-    usersModel.find(data, function(err, users) {
-        if (err) return next(err);
-        if (top && Number.isInteger(top)) {
-            users.splice(0, top);
+    users.fuzzyUsersSearch(triedUsername, top, function(err, users) {
+        if (err) {
+            next(err);
+            return;
         }
 
         return res.status(200).json(users);
-    }).select('-user_id -creation_date -__v');
+    });
 });
 
 module.exports = router;
