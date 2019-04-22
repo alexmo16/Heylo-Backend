@@ -92,13 +92,19 @@ module.exports = class ChatRoom {
             if (userIndex != -1) {
                 ids.splice(userIndex, 1);
 
-                chatModel.findByIdAndUpdate(roomID, { users_ids: ids }, function(err) {
+                chatModel.findByIdAndUpdate(roomID, { users_ids: ids }, function(err, room) {
                     if (err) {
                         next(err);
                         return;
                     }
 
-                    next();
+                    if (!room.users_ids) {
+                        chatModel.findByIdAndDelete(roomID, function(err) {
+                            next(err);
+                        });
+                    } else {
+                        next();   
+                    }
                 });
             } else {
                 next();

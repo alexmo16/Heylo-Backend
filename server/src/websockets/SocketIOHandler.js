@@ -1,19 +1,16 @@
 let chatroom = require('../services/chat/ChatRoom');
 
 module.exports = class SocketIOHandler {
-    // TO-DO restructure the code for socket IO
+    // TO-DO restructure the code for socket IO, better structure
 
     constructor(io) {
-        this.connections = [];
 
         let that = this;
         io.on('connection', function(socket) {
-            let connectionIndex = that.connections.push(socket) - 1;
             process.stdout.write(`${new Date()} Connection accepted.\n`);
 
             socket.on('disconnect', function() {
                 process.stdout.write(`${new Date()} Peer disconnected.\n`);
-                that.connections.splice(connectionIndex, 1);
             });
 
             socket.on('join', function(data, next) {
@@ -34,11 +31,38 @@ module.exports = class SocketIOHandler {
                 });
             });
 
-            // user sent some message
-            socket.on('message', function(message) {
-                that.connections.forEach(function (clientConnection) {
-                    clientConnection.emit('message', message);
-                });
+            socket.on('leave', function(data, next) {
+                if (data && data.room) {
+                    if (socket.rooms[data.room]) {
+                        socket.leave(data.room);
+                    }
+                } else {
+                    err = new Error('A room was not specified.');
+                    next(JSON.stringify(err));
+                    return;
+                }
+                
+            });
+
+            // User sent some message
+            socket.on('message', function(data, next) {
+                // Check for data integrity and if the socket is allowed
+                // to talk to the desired room.
+                try {
+                    if (data && data.room && data.message) {
+                        if (socket.rooms[data.room]) {
+                            socket.to(data.room).emit(data.message);
+                        } else {
+                            throw new Error('Access denied.');
+                        }
+                    } else {
+                        throw new Error('cannot send your message.');   
+                    }
+                } catch (err) {
+                    next(JSON.stringify(err));
+                    return;
+                }
+                
             });
         });
     }

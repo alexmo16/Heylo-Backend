@@ -78,7 +78,7 @@ router.put(`${route}/:roomID`, function(req, res, next) {
     
     if (!roomID || !userID) return res.sendStatus(400);
 
-    userChat.leaveChat(userID, roomID, function(err) {
+    chatroom.leaveRoom(userID, roomID, function(err) {
         if (err) {
             if (err.code) {
                 res.status(err.code).json(err.message);
