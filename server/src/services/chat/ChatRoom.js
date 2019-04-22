@@ -76,4 +76,33 @@ module.exports = class ChatRoom {
             next(err, isInRoom);
         });
     }
+
+    //TODO: test the leave room in database
+    static leaveRoom(userID, roomID, next) {
+        chatModel.findById(roomID, function(err, room) {
+            if (err) {
+                err = new Error('room not found');
+                err.code = 404;
+                next(err);
+                return;
+            }
+
+            let ids = room.users_ids;
+            let userIndex = ids.findIndex(userID);
+            if (userIndex != -1) {
+                ids.splice(userIndex, 1);
+
+                chatModel.findByIdAndUpdate(roomID, { users_ids: ids }, function(err) {
+                    if (err) {
+                        next(err);
+                        return;
+                    }
+
+                    next();
+                });
+            } else {
+                next();
+            }
+        });
+    }
 };

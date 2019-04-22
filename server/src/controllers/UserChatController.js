@@ -6,9 +6,11 @@ let userChat = require('../services/userchat/UserChat');
 let users = require('../services/users/Users');
 let chatroom = require('../services/chat/ChatRoom');
 
-router.all('/user/chats', validator);
+let route = '/user/chats';
 
-router.get('/user/chats', function(req, res, next) {
+router.all(route, validator);
+
+router.get(route, function(req, res, next) {
     let userID = req.user_payload.sub;
     if (!userID) return res.sendStatus(400);
     
@@ -34,7 +36,7 @@ router.get('/user/chats', function(req, res, next) {
     });
 });
 
-router.post('/user/chats', function(req, res, next) {
+router.post(route, function(req, res, next) {
     // query validation.
     let userID = req.user_payload.sub;
     let friendsObjectId = req.body.friendsId;
@@ -56,12 +58,10 @@ router.post('/user/chats', function(req, res, next) {
         if (err) {
             if (err.code) {
                 res.status(err.code).json(err.message);
-                return;
-            }
-            else {
+            } else {
                 next(err);
-                return
             }
+            return;
         }
 
         return res.status(201).json({
@@ -69,6 +69,26 @@ router.post('/user/chats', function(req, res, next) {
             name: chat.name,
             usersId: chat.users_ids
         });
+    });
+});
+
+router.put(`${route}/:roomID`, function(req, res, next) {
+    let userID = req.user_payload.sub;
+    let roomID = req.params.roomID;
+    
+    if (!roomID || !userID) return res.sendStatus(400);
+
+    userChat.leaveChat(userID, roomID, function(err) {
+        if (err) {
+            if (err.code) {
+                res.status(err.code).json(err.message);
+            } else {
+                next(err);
+            }
+            return;
+        }
+
+        return res.sendStatus(200);
     });
 });
 
