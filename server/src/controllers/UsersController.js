@@ -1,10 +1,10 @@
 let express = require('express');
-let validator = require('../middlewares/Validator');
+let validators = require('../middlewares/Validators');
 let router = express.Router();
 
 let users = require('../services/users/users');
 
-router.all('/users', validator);
+router.all('/users', validators.validator);
 
 router.get('/users', function(req, res, next) {
     if (!req.query.username || !req.query.username instanceof String) return res.sendStatus(400);

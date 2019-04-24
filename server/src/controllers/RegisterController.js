@@ -1,14 +1,14 @@
 let express = require('express');
 let router = express.Router();
 
-let validator = require('../middlewares/Validator');
+let validators = require('../middlewares/Validators');
 let users = require('../services/users/users');
 
 // create a new user
-router.post('/register', validator, function(req, res, next) {
+router.post('/register', validators.registrationValidator, function(req, res, next) {
     if (!req.body.username) return res.sendStatus(400);
-    if (!req.user_payload) return res.sendStatus(500);
-    let userInfo = req.user_payload;
+    if (!req.userPayload) return res.sendStatus(500);
+    let userInfo = req.userPayload;
     if (!userInfo.family_name || !userInfo.given_name || !userInfo.sub) return res.status(500).json(`unable to get user's informations.`);
 
     let userData = {

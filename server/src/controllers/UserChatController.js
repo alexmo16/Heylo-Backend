@@ -1,5 +1,5 @@
 let express = require('express');
-let validator = require('../middlewares/Validator');
+let validators = require('../middlewares/Validators');
 let router = express.Router();
 
 let userChat = require('../services/userchat/UserChat');
@@ -8,10 +8,10 @@ let chatroom = require('../services/chat/ChatRoom');
 
 let route = '/user/chats';
 
-router.all(route, validator);
+router.all(route, validators.validator);
 
 router.get(route, function(req, res, next) {
-    let userID = req.user_payload.sub;
+    let userID = req.userID;
     if (!userID) return res.sendStatus(400);
     
     users.findUser(userID, function(err, user) {
@@ -38,7 +38,7 @@ router.get(route, function(req, res, next) {
 
 router.post(route, function(req, res, next) {
     // query validation.
-    let userID = req.user_payload.sub;
+    let userID = req.userID;
     let friendsObjectId = req.body.friendsId;
     let errorMsg = '';
     friendsObjectId.forEach(function(objectId, index) {
@@ -73,7 +73,7 @@ router.post(route, function(req, res, next) {
 });
 
 router.put(`${route}/:roomID`, function(req, res, next) {
-    let userID = req.user_payload.sub;
+    let userID = req.userID;
     let roomID = req.params.roomID;
     
     if (!roomID || !userID) return res.sendStatus(400);

@@ -1,13 +1,13 @@
 let express = require('express');
 let router = express.Router();
 
-let validator = require('../middlewares/Validator');
+let validators = require('../middlewares/Validators');
 let users = require('../services/users/Users');
 
-router.get('/login', validator, function(req, res, next) {
-    if (!req.user_payload && !req.user_payload.sub) res.sendStatus(500);
+router.get('/login', validators.validator, function(req, res, next) {
+    if (!req.userID) res.sendStatus(500);
 
-    let userID = req.user_payload.sub;
+    let userID = req.userID;
     users.findUser(userID, function(err, user) {
         if (err) return next(err);
 
