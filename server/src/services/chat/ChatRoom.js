@@ -1,17 +1,11 @@
 let chatModel = require('../../models/ChatModel');
 
 module.exports = class ChatRoom {
-    constructor() {
-    }
-
     static findChatRoom(usersObjectID, next) {
         chatModel.findOne({
             users_ids: usersObjectID
         }, function(err, chat) {
-            if (err) {
-                next(err, null)
-                return;
-            }
+            if (err) return next(err, null);
 
             next(err, chat);
         });
@@ -23,10 +17,7 @@ module.exports = class ChatRoom {
         };
 
         chatModel.find(data, function(err, chats) {
-            if (err) {
-                next(err);
-                return;
-            }
+            if (err) return next(err);
 
             next(err, chats);
         }).select('-__v -creation_date');
@@ -39,21 +30,17 @@ module.exports = class ChatRoom {
         };
         let newChat = new chatModel(chatData);
         newChat.validate(function(err) {
-            if (err) {
-                next(err);
-                return;
-            }
+            if (err) return next(err);
 
             newChat.save(function(err, chat) {
                 if (err) {
                     if (err.code === 11000) {
                         err.code = 409;
                     } 
-                    next(err);
-                    return;
+                    return next(err);
                 }
 
-                next(err, chat);
+                return next(err, chat);
             });
         });
     }
@@ -67,13 +54,10 @@ module.exports = class ChatRoom {
         };
         
         chatModel.find(query, function(err, chat) {
-            if (err) {
-                next(err, null)
-                return;
-            }
+            if (err) return next(err, null);
             
             let isInRoom = chat && chat.length !== 0;
-            next(err, isInRoom);
+            return next(err, isInRoom);
         });
     }
 
@@ -83,8 +67,7 @@ module.exports = class ChatRoom {
             if (err) {
                 err = new Error('room not found');
                 err.code = 404;
-                next(err);
-                return;
+                return next(err);
             }
 
             let ids = room.users_ids;
@@ -93,21 +76,18 @@ module.exports = class ChatRoom {
                 ids.splice(userIndex, 1);
 
                 chatModel.findByIdAndUpdate(roomID, { users_ids: ids }, function(err, room) {
-                    if (err) {
-                        next(err);
-                        return;
-                    }
+                    if (err) return next(err);
 
                     if (!room.users_ids) {
                         chatModel.findByIdAndDelete(roomID, function(err) {
-                            next(err);
+                            return next(err);
                         });
                     } else {
-                        next();   
+                        return next();   
                     }
                 });
             } else {
-                next();
+                return next();
             }
         });
     }

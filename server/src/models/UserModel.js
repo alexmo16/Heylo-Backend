@@ -12,6 +12,15 @@ let UserSchema = new Schema({
         unique: true,
         required: [true, 'username needed.'],
     },
+    password: {
+        type: String,
+        unique: true,
+    },
+    email: {
+        type: String,
+        unique: true,
+        trim: true,
+    },
     firstname: {
         type: String,
         required: [true, 'first name needed.']
