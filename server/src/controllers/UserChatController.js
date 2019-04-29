@@ -14,22 +14,15 @@ router.get(route, function(req, res, next) {
     let userID = req.userID;
     if (!userID) return res.sendStatus(400);
     
-    users.findUser(userID, function(err, user) {
-        if (err) {
-            next(err);
-            return;
-        }
+    users.findUserByID(userID, function(err, user) {
+        if (err) return next(err);
 
         if (!user) {
-            res.status(404).json('user not found');
-            return;
+            return res.status(404).json('user not found');
         }
 
         chatroom.findUserChats(user._id, function(err, chats) {
-            if (err) {
-                next(err);
-                return;
-            }
+            if (err) return next(err);
 
             return res.status(200).json(chats);
         });

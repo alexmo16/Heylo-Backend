@@ -1,26 +1,28 @@
 let mongoose = require('mongoose');
+let bcrypt = require('bcryptjs');
 let userModel = require('../../models/UserModel');
 
 module.exports = class Users {
-    constructor() {
-    }
-
-    static findUser(userID, next) {
+    static findUserByID(userID, next) {
         userModel.findOne({user_id: userID}, function(err, user) {
-            if (err) {
-                next(err, null);
-                return;
-            }
+            if (err) return next(err, null);
     
             if (!user) {
                 err = new Error('User not found.');
-                next(err, null);
-                return;
+                return next(err, null);
             }
     
-            next(err, user);
+            return next(err, user);
         });
-    };
+    }
+
+    static findUserByEmail(email, next) {
+        userModel.findOne({email: email}, function(err, user) {
+            if (err) return next(err, null);
+
+            return next(err, user);
+        });
+    }
 
     static validateUsersByObjectID(strObjectIDs, next) {
         let err = null;
@@ -37,8 +39,7 @@ module.exports = class Users {
         if (!isValid) {
             err = new Error('Bad userID');
             err.code = 400;
-            next(err, isValid);
-            return;
+            return next(err, isValid);
         }
         
         let query = {
@@ -47,33 +48,49 @@ module.exports = class Users {
             }
         };
         userModel.find(query, function(err, users) {
-            if (err) {
-                next(err, null);
-                return;
-            }
+            if (err) return next(err, null);
 
             if (users.length === strObjectIDs.length) {
-                next(err, isValid);
-            } else {
-                isValid = false;
-                next(err, isValid);
+                return next(err, isValid);
             }
+            
+            isValid = false;
+            return next(err, isValid);
         });
     }
 
     static createUser(userData, next) {
-        let newUser = new userModel(userData);
-        newUser.save(function(err) {
-            if (err)  {
-                if (err.code === 11000) {
-                    err.code = 409;
-                }
-                next(err, null);
-                return;
-            }
+        if (userData.password) {
+            let saltLength = 10;
+            bcrypt.hash(user.password, saltLength, function(err, hash) {
+                if (err) return next(err);
+    
+                user.password = hash;
+                let newUser = new userModel(userData);
+                newUser.save(function(err) {
+                    if (err) {
+                        if (err.code === 11000) {
+                            err.code = 409;
+                        }
+                        return next(err, null);
+                    }
 
-            next(err, newUser)
-        });    
+                    return next(err, newUser);
+                });
+            });
+        } else {
+            let newUser = new userModel(userData);
+            newUser.save(function(err) {
+                if (err) {
+                    if (err.code === 11000) {
+                        err.code = 409;
+                    }
+                    return next(err, null);
+                }
+
+                return next(err, newUser);
+            });
+        }
     }
 
     static fuzzyUsersSearch(triedUsername, top, next) {
@@ -82,16 +99,13 @@ module.exports = class Users {
         };
     
         userModel.find(data, function(err, users) {
-            if (err) {
-                next(err, null);
-                return;
-            }
+            if (err) return next(err, null);
 
             if (top && Number.isInteger(top)) {
                 users.splice(0, top);
             }
     
-            next(err, users);
+            return next(err, users);
         }).select('-user_id -creation_date -__v');
     }
 };

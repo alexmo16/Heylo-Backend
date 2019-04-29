@@ -23,10 +23,11 @@ let socketIOHandler = require('../src/websockets/SocketIOHandler');
 let port = normalizePort(process.env.PORT || '4343');
 app.set('port', port);
 
-
+process.env.privateKey = fs.readFileSync('sslcert/cert.key');
+let cert = fs.readFileSync('sslcert/cert.pem');
 let credentials = {
-  key: fs.readFileSync('sslcert/cert.key'),
-  cert: fs.readFileSync('sslcert/cert.pem')
+  key: process.env.privateKey,
+  cert: cert
 };
 
 

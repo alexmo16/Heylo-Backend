@@ -1,38 +1,58 @@
 let GAuth = require('./GAuth');
+let HeyloAuth = require('./HeyloAuth');
 
 let validator = function(req, res, next) {
-    let uToken = req.headers.g_token;
-
-    _googleTokenValidation(uToken, function(err, payload) {
-        if (err) throw err;
-
-        users.findUser(userID, function(err) {
+    let token = req.headers.g_token;
+    if (token) {
+        _googleTokenValidation(token, function(err, payload) {
             if (err) throw err;
-            
-            req.userID = payload.sub;
-            req.userPayload = payload;
-
-            next();
+    
+            users.findUserByID(userID, function(err) {
+                if (err) throw err;
+                
+                req.userID = payload.sub;
+                req.userPayload = payload;
+    
+                return next();
+            });
+        }).catch(function () {
+            return res.sendStatus(401);
         });
-    }).catch(function () {
-        console.error;
-        return res.sendStatus(401);
-    });
+
+    } else {
+        token = req.headers.h_token;
+
+        if (token) {
+            HeyloAuth.verify(token, function(err) {
+                if (err) {
+                    return res.sendStatus(401);
+                }
+
+                return next();
+            });
+        } else {
+            return res.sendStatus(401);
+        }
+    }
 };
 
 let registrationValidator = function(req, res, next) {
-    let uToken = req.headers.g_token;
+    let token = req.headers.g_token;
 
-    _googleTokenValidation(uToken, function(err, payload) {
-        if (err) throw err;
+    if (token) {
+        _googleTokenValidation(token, function(err, payload) {
+            if (err) throw err;
 
-        req.userPayload = payload;
-        next();
+            req.userPayload = payload;
+            return next();
 
-    }).catch(function() {
-        console.error;
-        return res.sendStatus(401);
-    });
+        }).catch(function() {
+            console.error;
+            return res.sendStatus(401);
+        });
+    } else {
+        return next();
+    }
 
 };
 
