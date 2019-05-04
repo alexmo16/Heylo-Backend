@@ -1,33 +1,32 @@
 let GAuth = require('./GAuth');
 let HeyloAuth = require('./HeyloAuth');
+let users = require('../services/users/Users');
 
 let validator = function(req, res, next) {
     let token = req.headers.g_token;
     if (token) {
-        _googleTokenValidation(token, function(err, payload) {
-            if (err) throw err;
-    
+        GAuth.verify(token, function(payload) {
+            let userID = payload.sub;
+
             users.findUserByID(userID, function(err) {
                 if (err) throw err;
                 
-                req.userID = payload.sub;
+                req.userID = userID;
                 req.userPayload = payload;
-    
+                process.stdout.write('validated user\n');
                 return next();
             });
-        }).catch(function () {
+        }).catch(function (err) {
+            process.stdout.write(`${err.message}\n`);
             return res.sendStatus(401);
         });
-
     } else {
         token = req.headers.h_token;
-
         if (token) {
             HeyloAuth.verify(token, function(err) {
-                if (err) {
-                    return res.sendStatus(401);
-                }
-
+                if (err) return res.sendStatus(401);
+                
+                process.stdout.write('validated user\n');
                 return next();
             });
         } else {
@@ -40,30 +39,17 @@ let registrationValidator = function(req, res, next) {
     let token = req.headers.g_token;
 
     if (token) {
-        _googleTokenValidation(token, function(err, payload) {
-            if (err) throw err;
-
-            req.userPayload = payload;
+        GAuth.verify(token, function(userPayload) {
+            req.userPayload = userPayload;
             return next();
-
-        }).catch(function() {
-            console.error;
+    
+        }).catch(function (err) {
             return res.sendStatus(401);
         });
     } else {
         return next();
     }
 
-};
-
-let _googleTokenValidation = function(gToken, next) {
-    GAuth.verify(gToken, function(userPayload) {
-        process.stdout.write('validated user\n');
-        next(null, userPayload);
-
-    }).catch(function (err) {
-        next(err);
-    });
 };
 
 module.exports = {

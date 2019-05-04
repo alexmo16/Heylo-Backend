@@ -16,17 +16,20 @@ module.exports = class SocketIOHandler {
             socket.on('join', function(data, next) {
                 chatroom.isUserInRoom(data.userID, data.room, function(err, isInRoom) {
                     if (err) {
+                        process.stdout.write(err.message);
                         next(JSON.stringify(err));
                         return;
                     }
 
                     if (!isInRoom) {
-                        err = new Error('This user is not allowed to join this room.');
+                        err = new Error('This user is not allowed to join this room.\n');
+                        process.stdout.write(`Error: ${err.message}`);
                         next(JSON.stringify(err));
                         return;
                     }
                     
                     socket.join(data.room);
+                    process.stdout.write(`${data.userID} joined room ${data.room}\n`);
                     next();
                 });
             });
@@ -49,9 +52,11 @@ module.exports = class SocketIOHandler {
                 // Check for data integrity and if the socket is allowed
                 // to talk to the desired room.
                 try {
+                    console.log(data);
                     if (data && data.room && data.message) {
                         if (socket.rooms[data.room]) {
-                            socket.to(data.room).emit(data.message);
+                            socket.to(data.room).emit('message', data.message);
+                            next();
                         } else {
                             throw new Error('Access denied.');
                         }
@@ -59,6 +64,7 @@ module.exports = class SocketIOHandler {
                         throw new Error('cannot send your message.');   
                     }
                 } catch (err) {
+                    process.stdout.write(`Error: ${err.message}`);
                     next(JSON.stringify(err));
                     return;
                 }

@@ -1,38 +1,114 @@
-<html lang="en">
-  <head>
+<html>
+
+<head>
     <meta charset="utf-8">
     <title>Heylo API</title>
     <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="664535828561-btvq3r4m5q32laaukreaosvhum3p76j8.apps.googleusercontent.com">
+    <meta name="google-signin-client_id"
+        content="664535828561-btvq3r4m5q32laaukreaosvhum3p76j8.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-  </head>
-  <body>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <script>
-      function onSignIn(googleUser) {
-        // The ID token you need to pass to your backend:
-        let id_token = googleUser.getAuthResponse().id_token;
-        // put it in cookies for others url
-        document.cookie = 'g_token=' + id_token + '; path=/';
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+</head>
 
-        let options = {
-          headers: {
-            g_token: id_token
-          }
+<body>
+    <div class="inputContainer">
+        <label>username :</label>
+        <input id="username" />
+    </div>
+    <div class="inputContainer">
+        <label>firstname :</label>
+        <input id="firstname" />
+    </div>
+    <div class="inputContainer">
+        <label>lastname :</label>
+        <input id="lastname" />
+    </div>
+    <div class="inputContainer">
+        <label>email :</label>
+        <input id="email" />
+    </div>
+    <div class="inputContainer">
+        <label>password :</label>
+        <input id="password" />
+    </div>
+
+    <div style="display: inline-block;">
+        <div class="g-signin2" data-onsuccess="onGoogleSignIn" data-theme="dark"
+            style="margin-top: 30px; display: inline-flex;"></div>
+        <label> or </label>
+        <button onclick="submitCustomLogin()">submit for custom login</button>
+    </div>
+</body>
+
+<style>
+    .inputContainer {
+        margin-bottom: 20px;
+    }
+</style>
+
+<script>
+    function onGoogleSignIn(googleUser) {
+        if (!getCookie('g_token')) {
+            // The ID token you need to pass to your backend:
+            let id_token = googleUser.getAuthResponse().id_token;
+            // put it in cookies for others url
+            document.cookie = 'g_token=' + id_token + '; path=/';
+
+            let options = {
+                headers: {
+                    g_token: id_token
+                }
+            };
+
+            axios
+                .post("/register", {}, options)
+                .then(response => {
+                    if (response && response.data) {
+                        console.log(response.data);
+                    } else {
+                        throw new Error(":(");
+                    }
+                });
+
+        }
+    }
+
+    function submitCustomLogin() {
+
+        let body = {
+            username: $('#username').val(),
+            firstname: $('#firstname').val(),
+            lastname: $('#lastname').val(),
+            email: $('#email').val(),
+            password: $('#password').val()
         };
 
         axios
-        .post("/register", {username: 'Admin'}, options)
-        .then(response => {
-          if (response && response.data) {
-            console.log(response.data);
-          } else {
-            throw new Error(":(");
-          }
-        });
-        
-      }
-    </script>
-  </body>
+            .post("/register", body)
+            .then(response => {
+                if (response && response.data) {
+                    console.log(response.data);
+                } else {
+                    throw new Error(":(");
+                }
+            });
+    }
+
+    function getCookie(cname) {
+        var name = cname + '=';
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return '';
+    }
+</script>
+
 </html>

@@ -7,7 +7,9 @@ let utils = require('../utils/Utils');
 
 // TODO: re-think user login with userID.
 router.get('/login', function(req, res, next) {
-    if (!req.query.email) return res.sendStatus(500);
+    if (req.headers.g_token) return res.sendStatus(403);
+
+    if (!req.query.email) return res.sendStatus(400);
     if (!req.query.password) return res.sendStatus(400);
 
     let email = req.query.email;
@@ -21,7 +23,7 @@ router.get('/login', function(req, res, next) {
             if (err) return next(err);
 
             if (result) {
-                let jwt = utils.createToken();
+                let jwt = utils.createToken({email: user.email, user_id: user.user_id});
                 return res.status(200).json({token: jwt});
             } else {
                 return res.sendStatus(401);

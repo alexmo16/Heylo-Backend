@@ -1,50 +1,115 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <title>Heylo API</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 13px Helvetica, Arial;
+        }
+
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+
+        #messages {
+            margin-bottom: 40px
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
+    <div style="display: inline-flex; margin-top: 20px;">
+        <div style="margin-right: 15px;">
+            <label>room id :</label>
+            <input id="roomid"/>
+        </div>
+        <div>
+            <label>user id :</label>
+            <input id="userid"/>
+        </div>
+        <button onclick="joinRoom()" style="margin-left: 15px;">join room</button>
+    </div>
     <ul id="messages"></ul>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+        <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     <script src="https://localhost:4343/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      $(function () {
-        var socket = io('wss://localhost:4343/');
-        $('form').submit(function(){
-          socket.emit('message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        
-        var data = {
-          room: '5cb50efd5b085f2f64984c41',
-          userID: '5cb10b749572801d6807abe2'
-        };
-        socket.emit('join', data, function(err) {
-          if (err) {
-            console.log(err);
-          } else {
-            socket.on('message', function(msg){
-              $('#messages').append($('<li>').text(msg));
-              window.scrollTo(0, document.body.scrollHeight);
+        let socket;
+        $(function () {
+            socket = io('wss://localhost:4343/');
+            $('form').submit(function () {
+                let data = {
+                    room: $('#roomid').val(),
+                    message: $('#m').val()
+                }
+                socket.emit('message', data, function (err) {
+                    if (err) return console.log(err);
+
+                    $('#messages').append($('<li>').text(data.message));
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+                $('#m').val('');
+                return false;
             });
-          }
         });
-      });
+
+        function joinRoom() {
+            var data = {
+                room: $('#roomid').val(),
+                userID: $('#userid').val()
+            };
+            socket.emit('join', data, function (err) {
+                if (err) {
+                    return console.log(err);
+                } 
+                socket.on('message', function (msg) {
+                    $('#messages').append($('<li>').text(msg));
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+            });
+        }
     </script>
-  </body>
+</body>
+
 </html>

@@ -62,10 +62,10 @@ module.exports = class Users {
     static createUser(userData, next) {
         if (userData.password) {
             let saltLength = 10;
-            bcrypt.hash(user.password, saltLength, function(err, hash) {
+            bcrypt.hash(userData.password, saltLength, function(err, hash) {
                 if (err) return next(err);
     
-                user.password = hash;
+                userData.password = hash;
                 let newUser = new userModel(userData);
                 newUser.save(function(err) {
                     if (err) {
