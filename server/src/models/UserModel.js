@@ -7,19 +7,15 @@ let UserSchema = new Schema({
         unique: true,
         required: [true, 'userId needed.']
     },
-    username: {
-        type: String,
-        unique: true,
-        required: [true, 'username needed.'],
-    },
-    password: {
-        type: String,
-        unique: true,
-    },
     email: {
         type: String,
         unique: true,
         trim: true,
+        required: [true, 'email needed.']
+    },
+    username: {
+        type: String,
+        required: [true, 'username needed.'],
     },
     firstname: {
         type: String,
@@ -28,6 +24,10 @@ let UserSchema = new Schema({
     lastname: {
         type: String,
         required: [true, 'last name needed.']
+    },
+    password: {
+        type: String,
+        unique: true,
     },
     creation_date: {
         type: Date,
