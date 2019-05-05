@@ -71,7 +71,7 @@ module.exports = class ChatRoom {
             }
 
             let ids = room.users_ids;
-            let userIndex = ids.findIndex(userID);
+            let userIndex = ids.indexOf(userID);
             if (userIndex != -1) {
                 ids.splice(userIndex, 1);
 
