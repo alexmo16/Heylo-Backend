@@ -23,10 +23,11 @@ let validator = function(req, res, next) {
     } else {
         token = req.headers.h_token;
         if (token) {
-            HeyloAuth.verify(token, function(err) {
+            HeyloAuth.verify(token, function(err, payload) {
                 if (err) return res.sendStatus(401);
                 
                 process.stdout.write('validated user\n');
+                req.userID = payload.user_id;
                 return next();
             });
         } else {

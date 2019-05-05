@@ -8,7 +8,7 @@ let chatroom = require('../services/chat/ChatRoom');
 
 let route = '/user/chats';
 
-router.all(route, validators.validator);
+router.all(`${route}*`, validators.validator);
 
 router.get(route, function(req, res, next) {
     let userID = req.userID;
