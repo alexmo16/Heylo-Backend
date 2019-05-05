@@ -64,7 +64,7 @@ module.exports = class SocketIOHandler {
                         throw new Error('cannot send your message.');   
                     }
                 } catch (err) {
-                    process.stdout.write(`Error: ${err.message}`);
+                    process.stdout.write(`Error: ${err.message}\n`);
                     next(JSON.stringify(err));
                     return;
                 }
