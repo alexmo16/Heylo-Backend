@@ -1,4 +1,3 @@
-let mongoose = require('mongoose');
 let bcrypt = require('bcryptjs');
 let userModel = require('../../models/UserModel');
 
@@ -24,33 +23,17 @@ module.exports = class Users {
         });
     }
 
-    static validateUsersByObjectID(strObjectIDs, next) {
-        let err = null;
+    static validateUsersByID(usersID, next) {
         let isValid = true;
-        let objectIdList = [];
-        strObjectIDs.forEach(function(objectID) {
-            if (!mongoose.Types.ObjectId.isValid(objectID)) {
-                isValid = false;
-            } else {
-                objectIdList.push(new mongoose.Types.ObjectId(objectID));
-            }
-        });
-
-        if (!isValid) {
-            err = new Error('Bad userID');
-            err.code = 400;
-            return next(err, isValid);
-        }
-        
         let query = {
-            '_id': {
-                $in: objectIdList
+            'user_id': {
+                $in: usersID
             }
         };
         userModel.find(query, function(err, users) {
             if (err) return next(err, null);
 
-            if (users.length === strObjectIDs.length) {
+            if (users.length === usersID.length) {
                 return next(err, isValid);
             }
             
@@ -106,6 +89,6 @@ module.exports = class Users {
             }
     
             return next(err, users);
-        }).select('-user_id -creation_date -__v');
+        }).select('-_id -creation_date -__v');
     }
 };

@@ -60,7 +60,7 @@ router.post(route, function(req, res, next) {
         return res.status(201).json({
             id: chat._id,
             name: chat.name,
-            usersId: chat.users_ids
+            usersID: chat.users_ids
         });
     });
 });

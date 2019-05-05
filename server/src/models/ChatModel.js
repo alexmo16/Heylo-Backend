@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-let idValidator = require('mongoose-id-validator');
 
 let Schema = mongoose.Schema;
 let ChatSchema = new Schema({
@@ -8,7 +7,7 @@ let ChatSchema = new Schema({
         default: ''
     },
     users_ids: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'user',
         required: [true, 'needs to specify users ids']
     }],
@@ -18,7 +17,6 @@ let ChatSchema = new Schema({
     }
 });
 
-ChatSchema.plugin(idValidator);
 
 let ChatModel = mongoose.model('chat', ChatSchema);
 module.exports = ChatModel;

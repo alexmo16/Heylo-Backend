@@ -1,7 +1,7 @@
 let chatModel = require('../../models/ChatModel');
 
 module.exports = class ChatRoom {
-    static findChatRoom(usersObjectID, next) {
+    static findRoomByUsers(usersObjectID, next) {
         chatModel.findOne({
             users_ids: usersObjectID
         }, function(err, chat) {
@@ -20,12 +20,12 @@ module.exports = class ChatRoom {
             if (err) return next(err);
 
             next(err, chats);
-        }).select('-__v -creation_date');
+        }).select('-__v -creation_date -_id');
     }
 
-    static createChatRoom(usersObjectID, roomName, next) {
+    static createChatRoom(usersID, roomName, next) {
         let chatData = {
-            users_ids: usersObjectID,
+            users_ids: usersID,
             name: roomName
         };
         let newChat = new chatModel(chatData);
@@ -64,7 +64,7 @@ module.exports = class ChatRoom {
     //TODO: test the leave room in database
     static leaveRoom(userID, roomID, next) {
         chatModel.findById(roomID, function(err, room) {
-            if (err) {
+            if (err || !room) {
                 err = new Error('room not found');
                 err.code = 404;
                 return next(err);
@@ -78,7 +78,7 @@ module.exports = class ChatRoom {
                 chatModel.findByIdAndUpdate(roomID, { users_ids: ids }, function(err, room) {
                     if (err) return next(err);
 
-                    if (!room.users_ids) {
+                    if (ids.length === 0) {
                         chatModel.findByIdAndDelete(roomID, function(err) {
                             return next(err);
                         });
