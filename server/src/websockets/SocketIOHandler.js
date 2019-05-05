@@ -52,7 +52,6 @@ module.exports = class SocketIOHandler {
                 // Check for data integrity and if the socket is allowed
                 // to talk to the desired room.
                 try {
-                    console.log(data);
                     if (data && data.room && data.message) {
                         if (socket.rooms[data.room]) {
                             socket.to(data.room).emit('message', data.message);
