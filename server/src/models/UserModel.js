@@ -9,8 +9,8 @@ let UserSchema = new Schema({
     },
     email: {
         type: String,
-        unique: true,
         trim: true,
+        unique: true,
         required: [true, 'email needed.']
     },
     username: {
