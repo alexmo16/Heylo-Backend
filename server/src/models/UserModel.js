@@ -27,7 +27,6 @@ let UserSchema = new Schema({
     },
     password: {
         type: String,
-        unique: true,
     },
     creation_date: {
         type: Date,

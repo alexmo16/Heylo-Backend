@@ -32,22 +32,25 @@ router.get(route, function(req, res, next) {
 router.post(route, function(req, res, next) {
     // query validation.
     let userID = req.userID;
-    let friendsObjectId = req.body.friendsId;
+    let friendsObjectID = req.body.friendsID;
+
+    if (!userID || !friendsObjectID) return res.sendStatus(400);
+
     let errorMsg = '';
-    friendsObjectId.forEach(function(objectId, index) {
-        if (friendsObjectId.indexOf(objectId) !== -1 &&
-        friendsObjectId.indexOf(objectId) !== index) {
+    friendsObjectID.forEach(function(objectID, index) {
+        if (friendsObjectID.indexOf(objectID) !== -1 &&
+        friendsObjectID.indexOf(objectID) !== index) {
             errorMsg = 'Duplicate of users';
             return new Error();
         }
     });
     if (errorMsg) return res.status(400).json(errorMsg);
     if (!userID) return res.sendStatus(400);
-    if (!friendsObjectId || !Array.isArray(friendsObjectId)) return res.sendStatus(400);
+    if (!friendsObjectID || !Array.isArray(friendsObjectID)) return res.sendStatus(400);
     if (req.body.roomName && !req.body.roomName instanceof String) return res.sendStatus(400);
 
     // answer request
-    userChat.createChat(userID, friendsObjectId, req.body.roomName, function(err, chat) {
+    userChat.createChat(userID, friendsObjectID, req.body.roomName, function(err, chat) {
         if (err) {
             if (err.code) {
                 res.status(err.code).json(err.message);
