@@ -28,6 +28,10 @@ let UserSchema = new Schema({
     password: {
         type: String,
     },
+    friends: {
+        type: String,
+        ref: 'user'
+    },
     creation_date: {
         type: Date,
         default: Date.now()

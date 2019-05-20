@@ -7,4 +7,5 @@ router.get('/gauth', function(req, res, next) {
     res.sendFile(path.join(__dirname, '../../public', 'gauth.html'));
 });
 
+
 module.exports = router;

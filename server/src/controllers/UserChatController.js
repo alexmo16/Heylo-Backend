@@ -10,6 +10,7 @@ let route = '/user/chats';
 
 router.all(`${route}*`, validators.validator);
 
+
 router.get(route, function(req, res, next) {
     let userID = req.userID;
     if (!userID) return res.sendStatus(400);
@@ -28,6 +29,7 @@ router.get(route, function(req, res, next) {
         });
     });
 });
+
 
 router.post(route, function(req, res, next) {
     // query validation.
@@ -68,6 +70,7 @@ router.post(route, function(req, res, next) {
     });
 });
 
+
 router.put(`${route}/:roomID`, function(req, res, next) {
     let userID = req.userID;
     let roomID = req.params.roomID;
@@ -87,5 +90,6 @@ router.put(`${route}/:roomID`, function(req, res, next) {
         return res.sendStatus(200);
     });
 });
+
 
 module.exports = router;

@@ -1,4 +1,4 @@
-module.exports = function(app){
+module.exports = function(app) {
     let indexController = require('./src/controllers/IndexController');
     let searchUsersController = require('./src/controllers/SearchUsersController');
     let userController = require('./src/controllers/UserController');
@@ -6,6 +6,7 @@ module.exports = function(app){
     let registerController = require('./src/controllers/RegisterController');
     let userChatController = require('./src/controllers/UserChatController');
     let gauthTestController = require('./src/controllers/GAuthTestController');
+    let friendsController = require('./src/controllers/FriendsController');
 
     app.use(indexController);
     app.use(searchUsersController);
@@ -14,4 +15,5 @@ module.exports = function(app){
     app.use(registerController);
     app.use(userChatController);
     app.use(gauthTestController);
+    app.use(friendsController);
 };

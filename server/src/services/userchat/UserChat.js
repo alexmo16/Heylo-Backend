@@ -18,7 +18,7 @@ module.exports = class UserChat {
                 return next(err);
             }
     
-            users.validateUsersByID(friendsUsersID, function(err, isValid) {
+            users.isValidUsers(friendsUsersID, function(err, isValid) {
                 if (err || !isValid) {
                     err = new Error('some users does not exist');
                     err.code = 404;

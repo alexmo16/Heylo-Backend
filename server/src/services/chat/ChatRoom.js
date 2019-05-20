@@ -11,6 +11,7 @@ module.exports = class ChatRoom {
         });
     }
 
+
     static findUserChats(userID, next) {
         let data = {
             users_ids: { '$in': [userID] }
@@ -22,6 +23,7 @@ module.exports = class ChatRoom {
             next(err, chats);
         }).select('-__v -creation_date -_id');
     }
+
 
     static createChatRoom(usersID, roomName, next) {
         let chatData = {
@@ -45,6 +47,7 @@ module.exports = class ChatRoom {
         });
     }
 
+
     static isUserInRoom(userID, roomID, next) {
         let query = {
             _id: roomID,
@@ -60,6 +63,7 @@ module.exports = class ChatRoom {
             return next(err, isInRoom);
         });
     }
+
 
     //TODO: test the leave room in database
     static leaveRoom(userID, roomID, next) {
