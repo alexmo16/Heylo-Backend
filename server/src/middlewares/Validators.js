@@ -9,7 +9,7 @@ let validator = function(req, res, next) {
             let userID = payload.sub;
 
             users.findUserByID(userID, function(err) {
-                if (err) throw err;
+                if (err) return res.sendStatus(401);
                 
                 req.userID = userID;
                 req.userPayload = payload;
