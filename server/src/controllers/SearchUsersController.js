@@ -6,6 +6,7 @@ let users = require('../services/users/users');
 
 router.all('/search/users', validators.validator);
 
+
 router.get('/search/users', function(req, res, next) {
     if (!req.query.username || !req.query.username instanceof String) return res.sendStatus(400);
 
@@ -18,5 +19,6 @@ router.get('/search/users', function(req, res, next) {
         return res.status(200).json(users);
     });
 });
+
 
 module.exports = router;

@@ -23,7 +23,7 @@ module.exports = class Users {
         });
     }
 
-    static validateUsersByID(usersID, next) {
+    static isValidUsers(usersID, next) {
         let isValid = true;
         let query = {
             'user_id': {

@@ -11,6 +11,7 @@ router.get('/register', function(req, res, next) {
     res.sendFile(path.join(__dirname, '../../public', 'register.html'));
 });
 
+
 // create a new user
 router.post('/register', validators.registrationValidator, function(req, res, next) {
     let googleUserInfo = req.userPayload;
@@ -28,6 +29,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
         lastname: googleUserInfo && googleUserInfo.family_name ? googleUserInfo.family_name : req.body.lastname,
         user_id: googleUserInfo && googleUserInfo.sub ? googleUserInfo.sub : uuidv4()
     };
+
 
     users.createUser(userData, function(err, newUser) {
         if (err)  {
@@ -54,5 +56,6 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
         return res.status(201).json(responseData);
     });
 });
+
 
 module.exports = router;

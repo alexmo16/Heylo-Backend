@@ -6,6 +6,7 @@ let users = require('../services/users/Users');
 
 router.all('/user', validators.validator);
 
+
 router.get('/user', function(req, res, next) {
     if (!req.userID) return res.sendStatus(500);
 
@@ -25,5 +26,6 @@ router.get('/user', function(req, res, next) {
         return res.status(200).json(responseJson); 
     });
 });
+
 
 module.exports = router;

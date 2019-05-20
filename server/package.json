@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build": "node ./bin/www production=true",
-    "start": "node_modules/.bin/nodemon ./bin/www"
+    "start": "node_modules/.bin/nodemon ./bin/www",
+    "debug": "node_modules/.bin/nodemon --inspect-brk=9229 ./bin/www"
   },
   "dependencies": {
     "async": "^2.6.2",
