@@ -24,14 +24,28 @@ module.exports = class Friends {
         });
     }
 
+
     static findFriendsRelation(relationData, next) {
         let err;
-        if (!relationData.recipient || !relationData.requester) {
-            err = new Error('Recipient or requester is missing.');
+        if (!relationData.friend || !relationData.requester) {
+            err = new Error('friend or requester is missing.');
             return next(err);
         }
 
-        friendsModel.findOne(relationData, function(err, result) {
+        let query = {
+            $or: [
+                {
+                    'requester': relationData.requester,
+                    'recipient': relationData.friend
+                },
+                {
+                    'requester': relationData.friend,
+                    'recipient': relationData.requester
+                }
+            ] 
+        };
+
+        friendsModel.findOne(query, function(err, result) {
             if (err) return next(err);
 
             if (!result) {
@@ -70,6 +84,7 @@ module.exports = class Friends {
         });
     }
 
+
     static isRecipient(relationID, userID, next) {
         if (!relationID || !userID) {
             let err = new Error('RelationID or userID is missing.');
@@ -99,6 +114,7 @@ module.exports = class Friends {
         });
     };
 
+
     static acceptFriendRequest(relationID, next) {
         if (!relationID) {
             let err = new Error('RelationID is missing.');
@@ -109,6 +125,36 @@ module.exports = class Friends {
         };
         friendsModel.findByIdAndUpdate(relationID, relationUpdate, function(err) {
             next(err);
+        });
+    }
+
+
+    static isInRelationWithUsers(userID, friendsID, next) {
+        if (!userID || !friendsID || !friendsID instanceof Array) {
+            let err = new Error('usersID are missing.');
+            return next(err);
+        }
+        
+        let query = {
+            $or: [
+                {
+                    'requester': userID,
+                    'recipient': {
+                        $in: friendsID
+                    }
+                },
+                {
+                    'recipient': userID,
+                    'requester': {
+                        $in: friendsID
+                    }
+                }
+            ]
+        };
+        friendsModel.find(query, function(err, relations) {
+            if (err) return next(err);
+
+            return next(err, relations && relations.length === friendsID.length);
         });
     }
 };
