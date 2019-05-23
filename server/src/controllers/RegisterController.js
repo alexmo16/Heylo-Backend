@@ -33,11 +33,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
 
     users.createUser(userData, function(err, newUser) {
         if (err)  {
-            if (err.code === 409) {
-                return res.status(err.code).json('this user already exists, try again');
-            } else {
-                return next(err);
-            }
+            return err.code === 409 ? res.status(err.code).json('this user already exists, try again') : next(err);
         }
 
         let responseData = {

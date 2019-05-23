@@ -4,7 +4,7 @@ let router = express.Router();
 
 let users = require('../services/users/Users');
 
-router.all('/user', validators.validator);
+router.all('/user*', validators.validator);
 
 
 router.get('/user', function(req, res, next) {

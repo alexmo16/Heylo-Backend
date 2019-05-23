@@ -7,26 +7,25 @@ let users = require('../services/users/Users');
 
 router.all('/friends*', validators.validator);
 
-router.get('/friends', function(req, res, next) {
+
+router.get('/friends/:friendID', function(req, res, next) {
     let requester = req.userID;
-    let recipient = req.query.recipient;
-    if (!recipient || !requester) return res.sendStatus(400);
+    let friendID = req.params['friendID'];
+    if (!friendID || !requester) return res.sendStatus(400);
 
     let data = {
         requester: requester,
-        recipient: recipient
+        friend: friendID
     };
     friends.findFriendsRelation(data, function(err, relation) {
         if (err) {
-            if (err.code) {
-                return res.status(err.code).json(err.message);
-            }
-            return next(err);
+            return err.code ? res.status(err.code).json(err.message) : next(err);
         }
         
         return res.status(200).json(relation);
     });
 });
+
 
 router.post('/friends', function(req, res, next) {
     let recipient = req.body.recipient;
@@ -43,10 +42,7 @@ router.post('/friends', function(req, res, next) {
             };
             friends.createFriendsRelation(data, function(err) {
                 if (err) {
-                    if (err.code) {
-                        return res.status(err.code).json(err.message);
-                    }
-                    return next(err);
+                    return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
                 return res.sendStatus(201);
             }); 
