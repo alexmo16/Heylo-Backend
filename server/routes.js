@@ -1,19 +1,17 @@
 module.exports = function(app) {
-    let indexController = require('./src/controllers/IndexController');
-    let searchUsersController = require('./src/controllers/SearchUsersController');
-    let userController = require('./src/controllers/UserController');
-    let loginController = require('./src/controllers/LoginController');
-    let registerController = require('./src/controllers/RegisterController');
-    let userChatController = require('./src/controllers/UserChatController');
-    let gauthTestController = require('./src/controllers/GAuthTestController');
-    let friendsController = require('./src/controllers/FriendsController');
+    let controllers = {
+        indexController : require('./src/controllers/IndexController'),
+        searchUsersController : require('./src/controllers/SearchUsersController'),
+        userController : require('./src/controllers/UserController'),
+        loginController : require('./src/controllers/LoginController'),
+        registerController : require('./src/controllers/RegisterController'),
+        userChatController : require('./src/controllers/UserChatController'),
+        gauthTestController : require('./src/controllers/GAuthTestController'),
+        friendsController : require('./src/controllers/FriendsController'),
+        passwordController : require('./src/controllers/PasswordController'),
+    }
 
-    app.use(indexController);
-    app.use(searchUsersController);
-    app.use(userController);
-    app.use(loginController);
-    app.use(registerController);
-    app.use(userChatController);
-    app.use(gauthTestController);
-    app.use(friendsController);
+    Object.keys(controllers).forEach(function(controllerName) {
+        app.use(controllers[controllerName]); 
+    });
 };
