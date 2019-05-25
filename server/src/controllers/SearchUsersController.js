@@ -8,7 +8,7 @@ router.all('/search/users*', validators.validator);
 
 
 router.get('/search/users', function(req, res, next) {
-    if (!req.query.username || !req.query.username instanceof String) return res.sendStatus(400);
+    if (!req.query.username || !(typeof req.query.username === 'string')) return res.sendStatus(400);
 
     let top = req.query.username;
     let triedUsername = req.query.username;

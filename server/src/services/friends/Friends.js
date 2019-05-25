@@ -130,7 +130,7 @@ module.exports = class Friends {
 
 
     static isInRelationWithUsers(userID, friendsID, next) {
-        if (!userID || !friendsID || !friendsID instanceof Array) {
+        if (!userID || !friendsID || !(friendsID instanceof Array)) {
             let err = new Error('usersID are missing.');
             return next(err);
         }
