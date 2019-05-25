@@ -9,7 +9,7 @@ router.all('/friends*', validators.validator);
 
 
 router.get('/friends/:friendID', function(req, res, next) {
-    let requester = req.userID;
+    let requester = req.user.userID;
     let friendID = req.params['friendID'];
     if (!friendID || !requester) return res.sendStatus(400);
 
@@ -29,7 +29,7 @@ router.get('/friends/:friendID', function(req, res, next) {
 
 router.post('/friends', function(req, res, next) {
     let recipient = req.body.recipient;
-    let requester = req.userID;
+    let requester = req.user.userID;
     if (!recipient || !requester || !typeof recipient === 'string') return res.sendStatus(400);
 
     users.isValidUsers([recipient, requester], function(err, isValid) {
@@ -56,7 +56,7 @@ router.post('/friends', function(req, res, next) {
 
 router.put('/friends/:relationID', function(req, res, next) {
     let relationID = req.params['relationID'];
-    let userID = req.userID;
+    let userID = req.user.userID;
     if (!relationID || !userID) return res.sendStatus(400);
 
     friends.isRecipient(relationID, userID, function(err, isRecipient) {
@@ -78,7 +78,7 @@ router.put('/friends/:relationID', function(req, res, next) {
 
 router.delete('/friends/:relationID', function(req, res, next) {
     let relationID = req.params['relationID'];
-    let userID = req.userID;
+    let userID = req.user.userID;
     if (!relationID || !userID) return res.sendStatus(400);
 
     friends.isInRelation(relationID, userID, function(err, hasRelationRights) {

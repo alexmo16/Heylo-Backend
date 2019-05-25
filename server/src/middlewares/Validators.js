@@ -11,8 +11,11 @@ let validator = function(req, res, next) {
             users.findUserByID(userID, function(err) {
                 if (err) return res.sendStatus(401);
                 
-                req.userID = userID;
-                req.userPayload = payload;
+                req.user = {
+                    userID : userID,
+                    userPayload : payload,
+                    registeredBy: 'GOOGLE'
+                };
                 process.stdout.write('validated user\n');
                 return next();
             });
@@ -27,7 +30,11 @@ let validator = function(req, res, next) {
                 if (err) return res.sendStatus(401);
                 
                 process.stdout.write('validated user\n');
-                req.userID = payload.user_id;
+                req.user = {
+                    userID : payload.user_id,
+                    userPayload : payload,
+                    registeredBy: 'HEYLO'
+                };
                 return next();
             });
         } else {

@@ -10,7 +10,7 @@ router.all('/user*', validators.validator);
 router.get('/user', function(req, res, next) {
     if (!req.userID) return res.sendStatus(500);
 
-    let userID = req.userID;
+    let userID = req.user.userID;
     users.findUserByID(userID, function(err, user) {
         if (err) return next(err);
 

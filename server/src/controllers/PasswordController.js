@@ -10,9 +10,10 @@ router.all('/password*', validators.validator);
 // Change a user's password.
 router.put('/password', function(req, res, next) {
     // Validate query.
-    let userID = req.userID;
+    let userID = req.user.userID;
     let newPassword = req.body.newPassword;
     if (!userID || !newPassword ||  typeof newPassword !== 'string') return res.sendStatus(400);
+    if (req.user.registeredBy !== 'HEYLO') return res.sendStatus(403);
 
     // Answer query.
     users.changeUserPassword(userID, newPassword, function(err, isPasswordChanged) {

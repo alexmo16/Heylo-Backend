@@ -14,7 +14,7 @@ router.get('/register', function(req, res, next) {
 
 // create a new user
 router.post('/register', validators.registrationValidator, function(req, res, next) {
-    let googleUserInfo = req.userPayload;
+    let googleUserInfo = req.user.userPayload;
     if (googleUserInfo && (!googleUserInfo.family_name || !googleUserInfo.given_name || !googleUserInfo.sub)) return res.status(500).json(`unable to get user's informations.`);
 
     if (!googleUserInfo) {

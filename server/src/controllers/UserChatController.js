@@ -13,7 +13,7 @@ router.all(`${route}*`, validators.validator);
 
 
 router.get(route, function(req, res, next) {
-    let userID = req.userID;
+    let userID = req.user.userID;
     if (!userID) return res.sendStatus(400);
     
     users.findUserByID(userID, function(err, user) {
@@ -34,7 +34,7 @@ router.get(route, function(req, res, next) {
 
 router.post(route, function(req, res, next) {
     // Query validation.
-    let userID = req.userID;
+    let userID = req.user.userID;
     let friendsUserID = req.body.friendsID;
 
     if (!userID || !friendsUserID) return res.sendStatus(400);
@@ -79,7 +79,7 @@ router.post(route, function(req, res, next) {
 
 router.patch(`${route}/:roomID`, function(req, res, next) {
     // Query Validation.
-    let userID = req.userID;
+    let userID = req.user.userID;
     let roomID = req.params.roomID;
     let friendsID = req.body.friendsID;
     
