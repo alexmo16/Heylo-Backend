@@ -41,8 +41,7 @@ router.post(route, function(req, res, next) {
 
     let errorMsg = '';
     friendsUserID.forEach(function(objectID, index) {
-        if (friendsUserID.indexOf(objectID) !== -1 &&
-        friendsUserID.indexOf(objectID) !== index) {
+        if (friendsUserID.indexOf(objectID) !== -1 && friendsUserID.indexOf(objectID) !== index) {
             errorMsg = 'Duplicate of users';
             return new Error();
         }
@@ -50,7 +49,7 @@ router.post(route, function(req, res, next) {
     if (errorMsg) return res.status(400).json(errorMsg);
     if (!userID) return res.sendStatus(400);
     if (!friendsUserID || !Array.isArray(friendsUserID)) return res.sendStatus(400);
-    if (req.body.roomName && !req.body.roomName instanceof String) return res.sendStatus(400);
+    if (req.body.roomName && !(typeof req.body.roomName === 'string')) return res.sendStatus(400);
 
     // Answer request.
     friends.isInRelationWithUsers(userID, friendsUserID, function(err, isInRelation) {
@@ -78,20 +77,53 @@ router.post(route, function(req, res, next) {
 });
 
 
-router.put(`${route}/:roomID`, function(req, res, next) {
+router.patch(`${route}/:roomID`, function(req, res, next) {
     // Query Validation.
     let userID = req.userID;
     let roomID = req.params.roomID;
+    let friendsID = req.body.friendsID;
     
-    if (!roomID || !userID) return res.sendStatus(400);
+    if (!roomID || !userID || !friendsID || !(friendsID instanceof Array)) return res.sendStatus(400);
+
+    let errorMsg = '';
+    friendsID.forEach(function(id, index) {
+        if (friendsID.indexOf(id) !== -1 && friendsID.indexOf(id) !== index) {
+            errorMsg = 'Duplicate of users';
+            return new Error();
+        }
+    });
+    if (errorMsg) return res.status(400).json(errorMsg);
 
     // Answer request.
-    chatroom.leaveRoom(userID, roomID, function(err) {
+    chatroom.isUserInRoom(userID, roomID, function(err, isInRoom) {
         if (err) {
             return err.code ? res.status(err.code).json(err.message) : next(err);
         }
-
-        return res.sendStatus(200);
+        
+        if (isInRoom) {
+            friends.isInRelationWithUsers(userID, friendsID, function(err, isInRelation) {
+                if (err) {
+                    return err.code ? res.status(err.code).json(err.message) : next(err);
+                }
+                
+                if (isInRelation) {
+                    let users = friendsID.concat(userID);
+                    chatroom.updateRoom(users, roomID, function(err) {
+                        if (err) {
+                            return err.code ? res.status(err.code).json(err.message) : next(err);
+                        }
+                        
+                        return res.sendStatus(200);
+                    });
+        
+                } else {
+                    return res.sendStatus(403);
+                }
+            });
+            
+        } else {
+            return res.sendStatus(403);
+        }
     });
 });
 

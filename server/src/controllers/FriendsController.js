@@ -30,7 +30,7 @@ router.get('/friends/:friendID', function(req, res, next) {
 router.post('/friends', function(req, res, next) {
     let recipient = req.body.recipient;
     let requester = req.userID;
-    if (!recipient || !requester) return res.sendStatus(400);
+    if (!recipient || !requester || !typeof recipient === 'string') return res.sendStatus(400);
 
     users.isValidUsers([recipient, requester], function(err, isValid) {
         if (err) return next(err);
