@@ -28,6 +28,8 @@ let validator = function(req, res, next) {
         if (token) {
             HeyloAuth.verify(token, function(err, payload) {
                 if (err) return res.sendStatus(401);
+
+                if (req.connection.remoteAddress !== payload.ip) return res.sendStatus(401);
                 
                 process.stdout.write('validated user\n');
                 req.user = {

@@ -5,12 +5,8 @@ let bcrypt = require('bcryptjs');
 let users = require('../services/users/Users');
 let utils = require('../utils/Utils');
 
-// TODO: re-think user login with userID.
 router.post('/login', function(req, res, next) {
     if (req.headers.g_token) return res.sendStatus(403);
-
-    console.log(req.body.email);
-
     if (!req.body.email) return res.sendStatus(400);
     if (!req.body.password) return res.sendStatus(400);
 
@@ -27,7 +23,7 @@ router.post('/login', function(req, res, next) {
             if (err) return next(err);
 
             if (result) {
-                let jwt = utils.createToken({email: user.email, user_id: user.user_id});
+                let jwt = utils.createToken({email: user.email, user_id: user.user_id, ip: req.connection.remoteAddress});
                 return res.status(200).json({token: jwt});
             } else {
                 return res.sendStatus(401);
