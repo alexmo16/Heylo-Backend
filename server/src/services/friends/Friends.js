@@ -2,6 +2,13 @@ let friendsModel = require('../../models/FriendsModel').model;
 let friendshipStatus = require('../../models/FriendsModel').friendshipStatus;
 
 module.exports = class Friends {
+    
+    /**
+     * Create a new friendship in the database. The friendship will be set as PENDING and the
+     * recipient will have to accept the new friendship to change the status to ACCEPTED.
+     * @param {Object} relationData - Object containing the requester's ID and the recipient's ID.
+     * @param {Function} next - Callback function.
+     */
     static createFriendsRelation(relationData, next) {
         let err;
         if (!relationData.recipient || !relationData.requester) {
@@ -25,6 +32,12 @@ module.exports = class Friends {
     }
 
 
+    /**
+     * Find a relation of friendship between to users. It does not matter if the requester ID
+     * is in relationData.friend or relationData.requester.
+     * @param {Object} relationData - Object containing a requester ID and a friend ID.
+     * @param {Function} next - Callback function.
+     */
     static findFriendsRelation(relationData, next) {
         let err;
         if (!relationData.friend || !relationData.requester) {
@@ -59,6 +72,12 @@ module.exports = class Friends {
     };
 
 
+    /**
+     * Verify if a userID is in a specific relationID.
+     * @param {String} relationID - Relation ID in database.
+     * @param {String} userID - User ID to verify.
+     * @param {Function} next - Callback function.
+     */
     static isInRelation(relationID, userID, next) {
         if (!relationID || !userID) {
             let err = new Error('RelationID or userID is missing.');
@@ -85,6 +104,12 @@ module.exports = class Friends {
     }
 
 
+    /**
+     * Verify if a user in a relation is the recipient or not.
+     * @param {String} relationID - Relation ID in database.
+     * @param {String} userID - User ID to verify.
+     * @param {Function} next - Callback function.
+     */
     static isRecipient(relationID, userID, next) {
         if (!relationID || !userID) {
             let err = new Error('RelationID or userID is missing.');
@@ -104,6 +129,11 @@ module.exports = class Friends {
     }
 
 
+    /**
+     * Delete a specific relation in database.
+     * @param {String} relationID - Relation to delete.
+     * @param {Function} next - Callback function.
+     */
     static deleteFriendsRelation(relationID, next) {
         if (!relationID) {
             let err = new Error('RelationID is missing.');
@@ -115,6 +145,11 @@ module.exports = class Friends {
     };
 
 
+    /**
+     * Accept a PENDING relation.
+     * @param {String} relationID - Relation to accept.
+     * @param {Function} next - Callback function.
+     */
     static acceptFriendRequest(relationID, next) {
         if (!relationID) {
             let err = new Error('RelationID is missing.');
@@ -129,6 +164,12 @@ module.exports = class Friends {
     }
 
 
+    /**
+     * Verify if a user is friend with all the users in friendsID.
+     * @param {String} userID - User to verify.
+     * @param {Array.<String>} friendsID - Users who are possible friends with userID.
+     * @param {Function} next - Callback function.
+     */
     static isInRelationWithUsers(userID, friendsID, next) {
         if (!userID || !friendsID || !(friendsID instanceof Array)) {
             let err = new Error('usersID are missing.');

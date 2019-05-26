@@ -1,9 +1,15 @@
 let chatModel = require('../../models/ChatModel');
 
 module.exports = class ChatRoom {
-    static findRoomByUsers(usersObjectID, next) {
+
+    /**
+     * Find a room using an array of users' IDs in the room.
+     * @param {Array.<String>} usersID - array of users' IDs.
+     * @param {Function} next - Callback function.
+     */
+    static findRoomByUsers(usersID, next) {
         chatModel.findOne({
-            users_ids: usersObjectID
+            users_ids: usersID
         }, function(err, chat) {
             if (err) return next(err, null);
 
@@ -12,6 +18,11 @@ module.exports = class ChatRoom {
     }
 
 
+    /**
+     * Find all rooms of a specific user.
+     * @param {String} userID - ID of the specific user. 
+     * @param {Function} next - Callback function 
+     */
     static findUserChats(userID, next) {
         let data = {
             users_ids: { '$in': [userID] }
@@ -25,6 +36,12 @@ module.exports = class ChatRoom {
     }
 
 
+    /**
+     * Create a new chat room in the database.
+     * @param {Array.<String>} usersID - Array of users' IDs.
+     * @param {String} roomName - Room's name.
+     * @param {Function} next - Callback function.
+     */
     static createChatRoom(usersID, roomName, next) {
         let chatData = {
             users_ids: usersID,
@@ -48,6 +65,12 @@ module.exports = class ChatRoom {
     }
 
 
+    /**
+     * Verify if a user is in a specific room.
+     * @param {String} userID - User ID to verify.
+     * @param {String} roomID - Room ID to verify.
+     * @param {Function} next  - Callback function.
+     */
     static isUserInRoom(userID, roomID, next) {
         let query = {
             _id: roomID,
@@ -65,6 +88,12 @@ module.exports = class ChatRoom {
     }
 
 
+    /**
+     * Update the content of an already existing room in the database.
+     * @param {Array.<String>} usersID - Array of users in the room.
+     * @param {String} roomID - Room ID to update.
+     * @param {Function} next - Callback function.
+     */
     static updateRoom(usersID, roomID, next) {
         chatModel.findById(roomID, function(err, room) {
             if (err || !room) {

@@ -7,8 +7,8 @@ module.exports = class Users {
     
     /**
      * Find a user by is user ID, not the ObjectID of MongoDB.
-     * @param {String} userID User's ID.
-     * @param {function} next Callback function.
+     * @param {String} userID - User's ID.
+     * @param {function} next - Callback function.
      */
     static findUserByID(userID, next) {
         userModel.findOne({user_id: userID}, function(err, user) {
@@ -26,8 +26,8 @@ module.exports = class Users {
 
     /**
      * Find a user by is email.
-     * @param {String} email User's email.
-     * @param {function} next Callback function.
+     * @param {String} email - User's email.
+     * @param {function} next - Callback function.
      */
     static findUserByEmail(email, next) {
         userModel.findOne({email: email}, function(err, user) {
@@ -40,8 +40,8 @@ module.exports = class Users {
 
     /**
      * Validate that all users' IDs in usersID are real users' IDs.
-     * @param {Array} usersID User's ID.
-     * @param {function} next Callback function.
+     * @param {Array.<String>} usersID - User's ID.
+     * @param {function} next - Callback function.
      */
     static isValidUsers(usersID, next) {
         let isValid = true;
@@ -65,8 +65,8 @@ module.exports = class Users {
 
     /**
      * Create a new user with all the data in userData.
-     * @param {Object} userData All information required to create a new user in the database.
-     * @param {function} next Callback function.
+     * @param {Object} userData - All information required to create a new user in the database.
+     * @param {function} next - Callback function.
      */
     static createUser(userData, next) {
         if (userData.password) {
@@ -104,9 +104,9 @@ module.exports = class Users {
 
     /**
      * Run a fuzzy search of users in the database.
-     * @param {String} triedUsername Username used for the fuzzy search.
-     * @param {Number} top Number of X first results to return.
-     * @param {function} next Callback function.
+     * @param {String} triedUsername - Username used for the fuzzy search.
+     * @param {Number} top - Number of X first results to return.
+     * @param {function} next - Callback function.
      */
     static fuzzyUsersSearch(triedUsername, top, next) {
         let data = {
@@ -127,9 +127,9 @@ module.exports = class Users {
 
     /**
      * Change a specific user's password.
-     * @param {String} userID The user's ID.
-     * @param {String} newPassword The new desired password.
-     * @param {Function} next Callback function.
+     * @param {String} userID - The user's ID.
+     * @param {String} newPassword - The new desired password.
+     * @param {Function} next - Callback function.
      */
     static changeUserPassword(userID, newPassword, next) {
         if (!userID || typeof userID !== 'string' || !newPassword || typeof newPassword !== 'string') {

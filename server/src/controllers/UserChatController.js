@@ -2,7 +2,6 @@ let express = require('express');
 let validators = require('../middlewares/Validators');
 let router = express.Router();
 
-let userChat = require('../services/userchat/UserChat');
 let users = require('../services/users/Users');
 let chatroom = require('../services/chat/ChatRoom');
 let friends = require('../services/friends/Friends');
@@ -58,7 +57,7 @@ router.post(route, function(req, res, next) {
         }
 
         if (isInRelation) {
-            userChat.createChat(userID, friendsUserID, req.body.roomName, function(err, chat) {
+            createChat(userID, friendsUserID, req.body.roomName, function(err, chat) {
                 if (err) {
                     return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
@@ -127,5 +126,56 @@ router.patch(`${route}/:roomID`, function(req, res, next) {
     });
 });
 
+
+/**
+ * Create a new chat room.
+ * @param {String} userID - User who's doing the request.
+ * @param {Array.<String>} friendsUsersID - Friends of the requester to put in the room.
+ * @param {String} [roomName] - Custom room name, default value is an empty string.
+ * @param {Function} next - Callback function.
+ */
+let createChat = function(userID, friendsUsersID, roomName='', next) {
+    users.findUserByID(userID, function(err, user) {
+        if (err) return next(err);
+        
+        if (!user) {
+            err = new Error('user not found'); 
+            err.code = 404;
+            return next(err);
+        }
+        
+        if (friendsUsersID.indexOf(String(user.user_id)) !== -1) {
+            err = new Error('user cannot be is own friend');
+            err.code = 400;
+            return next(err);
+        }
+
+        users.isValidUsers(friendsUsersID, function(err, isValid) {
+            if (err || !isValid) {
+                err = new Error('some users does not exist');
+                err.code = 404;
+                return next(err);
+            }
+    
+            let usersID = [...friendsUsersID, userID];
+            chatroom.findRoomByUsers(usersID, function(err, chat) {
+                if (err) return next(err);
+    
+                if (chat) {
+                    err = new Error('This chat already exists');
+                    err.code = 409;
+                    return next(err);
+                }
+                
+                roomName = !!roomName? roomName : '';
+                chatroom.createChatRoom(usersID, roomName, function(err, chat) {
+                    if (err) return next(err);
+    
+                    next(err, chat);
+                });
+            });
+        });
+    });
+};
 
 module.exports = router;

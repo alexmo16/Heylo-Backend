@@ -2,6 +2,14 @@ let GAuth = require('./GAuth');
 let HeyloAuth = require('./HeyloAuth');
 let users = require('../services/users/Users');
 
+/**
+ * Function which validate if the user doing the request is allowed to talk to the server.
+ * The function will know if the token currently use is from us or from a
+ * 3rd party authentification system supported by our server.
+ * @param {Object} req - req object from Express framework.
+ * @param {Object} res - res object from Express framework.
+ * @param {Function} next - Callback function
+ */
 let validator = function(req, res, next) {
     let token = req.headers.g_token;
     if (token) {
@@ -45,6 +53,13 @@ let validator = function(req, res, next) {
     }
 };
 
+
+/**
+ * Custom validatior for the registration route, all others routes shall call the default validator function.
+ * @param {Object} req - req object from Express framework.
+ * @param {Object} res - res object from Express framework.
+ * @param {Function} next - Callback function
+ */
 let registrationValidator = function(req, res, next) {
     let token = req.headers.g_token;
 
