@@ -46,7 +46,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
 
         // This mean the user used our password system, so we need to create our own jwt.
         if (newUser.password) {
-            responseData.jwt = utils.createToken({email: newUser.email, user_id: newUser.user_id});
+            responseData.jwt = utils.createToken({email: newUser.email, user_id: newUser.user_id, ip: req.connection.remoteAddress});
         }
 
         return res.status(201).json(responseData);
