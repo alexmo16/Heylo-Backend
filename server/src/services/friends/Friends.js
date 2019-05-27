@@ -33,7 +33,7 @@ module.exports = class Friends {
 
 
     /**
-     * Find a relation of friendship between to users. It does not matter if the requester ID
+     * Find a relation of friendship between two users. It does not matter if the requester ID
      * is in relationData.friend or relationData.requester.
      * @param {Object} relationData - Object containing a requester ID and a friend ID.
      * @param {Function} next - Callback function.
@@ -177,18 +177,25 @@ module.exports = class Friends {
         }
         
         let query = {
-            $or: [
+            $and: [
                 {
-                    'requester': userID,
-                    'recipient': {
-                        $in: friendsID
-                    }
+                    $or: [
+                        {
+                            'requester': userID,
+                            'recipient': {
+                                $in: friendsID
+                            }
+                        },
+                        {
+                            'recipient': userID,
+                            'requester': {
+                                $in: friendsID
+                            }
+                        }
+                    ]
                 },
                 {
-                    'recipient': userID,
-                    'requester': {
-                        $in: friendsID
-                    }
+                    'status': friendshipStatus.ACCEPTED
                 }
             ]
         };
