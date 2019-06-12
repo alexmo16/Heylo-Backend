@@ -1,5 +1,6 @@
 let friendsModel = require('../../models/FriendsModel').model;
 let friendshipStatus = require('../../models/FriendsModel').friendshipStatus;
+let httpError = require('../../utils/HttpError');
 
 module.exports = class Friends {
     
@@ -13,6 +14,7 @@ module.exports = class Friends {
         let err;
         if (!relationData.recipient || !relationData.requester) {
             err = new Error('Recipient or requester is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
@@ -24,7 +26,7 @@ module.exports = class Friends {
 
             newFriends.save(function(err) {
                 if (err && err.code === 11000) {
-                    err.code = 409;
+                    err.code = httpError.CONFLICT;
                 }
                 return next(err);
             });
@@ -42,6 +44,7 @@ module.exports = class Friends {
         let err;
         if (!relationData.friend || !relationData.requester) {
             err = new Error('friend or requester is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
@@ -63,7 +66,7 @@ module.exports = class Friends {
 
             if (!result) {
                 err = new Error('Relation not found.');
-                err.code = 404;
+                err.code = httpError.NOT_FOUND;
                 return next(err, null);
             }
     
@@ -81,6 +84,7 @@ module.exports = class Friends {
     static isInRelation(relationID, userID, next) {
         if (!relationID || !userID) {
             let err = new Error('RelationID or userID is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
@@ -113,6 +117,7 @@ module.exports = class Friends {
     static isRecipient(relationID, userID, next) {
         if (!relationID || !userID) {
             let err = new Error('RelationID or userID is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
@@ -137,6 +142,7 @@ module.exports = class Friends {
     static deleteFriendsRelation(relationID, next) {
         if (!relationID) {
             let err = new Error('RelationID is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
         friendsModel.findByIdAndDelete(relationID, function(err) {
@@ -153,6 +159,7 @@ module.exports = class Friends {
     static acceptFriendRequest(relationID, next) {
         if (!relationID) {
             let err = new Error('RelationID is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
         let relationUpdate = {
@@ -173,6 +180,7 @@ module.exports = class Friends {
     static isInRelationWithUsers(userID, friendsID, next) {
         if (!userID || !friendsID || !(friendsID instanceof Array)) {
             let err = new Error('usersID are missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
         

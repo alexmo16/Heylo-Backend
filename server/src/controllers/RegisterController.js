@@ -6,6 +6,7 @@ let path = require('path');
 let validators = require('../middlewares/Validators');
 let users = require('../services/users/users');
 let utils = require('../utils/Utils');
+let httpError = require('../utils/HttpError');
 
 router.get('/register', function(req, res, next) {
     res.sendFile(path.join(__dirname, '../../public', 'register.html'));
@@ -15,10 +16,10 @@ router.get('/register', function(req, res, next) {
 // create a new user
 router.post('/register', validators.registrationValidator, function(req, res, next) {
     let googleUserInfo = req.user.userPayload;
-    if (googleUserInfo && (!googleUserInfo.family_name || !googleUserInfo.given_name || !googleUserInfo.sub)) return res.status(500).json(`unable to get user's informations.`);
+    if (googleUserInfo && (!googleUserInfo.family_name || !googleUserInfo.given_name || !googleUserInfo.sub)) return res.status(httpError.INTERNAL_SERVER_ERROR).json(`unable to get user's informations.`);
 
     if (!googleUserInfo) {
-        if (!req.body.email || !req.body.password || !req.body.username || !req.body.firstname || !req.body.lastname) return res.sendStatus(400);
+        if (!req.body.email || !req.body.password || !req.body.username || !req.body.firstname || !req.body.lastname) return res.sendStatus(httpError.BAD_REQUEST);
     }
 
     let userData = {
@@ -33,7 +34,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
 
     users.createUser(userData, function(err, newUser) {
         if (err)  {
-            return err.code === 409 ? res.status(err.code).json('this user already exists, try again') : next(err);
+            return err.code === httpError.CONFLICT ? res.status(err.code).json('this user already exists, try again') : next(err);
         }
 
         let responseData = {
@@ -49,7 +50,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
             responseData.jwt = utils.createToken({email: newUser.email, user_id: newUser.user_id, ip: req.connection.remoteAddress});
         }
 
-        return res.status(201).json(responseData);
+        return res.status(httpError.CREATED).json(responseData);
     });
 });
 

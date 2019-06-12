@@ -1,4 +1,5 @@
 let chatModel = require('../../models/ChatModel');
+let httpError = require('../../utils/HttpError');
 
 module.exports = class ChatRoom {
 
@@ -54,7 +55,7 @@ module.exports = class ChatRoom {
             newChat.save(function(err, chat) {
                 if (err) {
                     if (err.code === 11000) {
-                        err.code = 409;
+                        err.code = httpError.CONFLICT;
                     } 
                     return next(err);
                 }
@@ -98,7 +99,7 @@ module.exports = class ChatRoom {
         chatModel.findById(roomID, function(err, room) {
             if (err || !room) {
                 err = new Error('room not found');
-                err.code = 404;
+                err.code = httpError.NOT_FOUND;
                 return next(err);
             }
 

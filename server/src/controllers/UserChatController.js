@@ -5,6 +5,7 @@ let router = express.Router();
 let users = require('../services/users/Users');
 let chatroom = require('../services/chat/ChatRoom');
 let friends = require('../services/friends/Friends');
+let httpError = require('../utils/HttpError');
 
 let route = '/user/chats';
 
@@ -13,7 +14,7 @@ router.all(`${route}*`, validators.validator);
 
 router.get(route, function(req, res, next) {
     let userID = req.user.userID;
-    if (!userID) return res.sendStatus(400);
+    if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
     
     users.findUserByID(userID, function(err, user) {
         if (err) return next(err);
@@ -25,7 +26,7 @@ router.get(route, function(req, res, next) {
         chatroom.findUserChats(user._id, function(err, chats) {
             if (err) return next(err);
 
-            return res.status(200).json(chats);
+            return res.status(httpError.OK).json(chats);
         });
     });
 });
@@ -36,7 +37,7 @@ router.post(route, function(req, res, next) {
     let userID = req.user.userID;
     let friendsUserID = req.body.friendsID;
 
-    if (!userID || !friendsUserID) return res.sendStatus(400);
+    if (!userID || !friendsUserID) return res.sendStatus(httpError.BAD_REQUEST);
 
     let errorMsg = '';
     friendsUserID.forEach(function(objectID, index) {
@@ -45,10 +46,10 @@ router.post(route, function(req, res, next) {
             return new Error();
         }
     });
-    if (errorMsg) return res.status(400).json(errorMsg);
-    if (!userID) return res.sendStatus(400);
-    if (!friendsUserID || !Array.isArray(friendsUserID)) return res.sendStatus(400);
-    if (req.body.roomName && !(typeof req.body.roomName === 'string')) return res.sendStatus(400);
+    if (errorMsg) return res.status(httpError.BAD_REQUEST).json(errorMsg);
+    if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
+    if (!friendsUserID || !Array.isArray(friendsUserID)) return res.sendStatus(httpError.BAD_REQUEST);
+    if (req.body.roomName && !(typeof req.body.roomName === 'string')) return res.sendStatus(httpError.BAD_REQUEST);
 
     // Answer request.
     friends.isInRelationWithUsers(userID, friendsUserID, function(err, isInRelation) {
@@ -62,7 +63,7 @@ router.post(route, function(req, res, next) {
                     return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
         
-                return res.status(201).json({
+                return res.status(httpError.CREATED).json({
                     id: chat._id,
                     name: chat.name,
                     usersID: chat.users_ids
@@ -70,7 +71,7 @@ router.post(route, function(req, res, next) {
             });
 
         } else {
-            return res.sendStatus(403);
+            return res.sendStatus(httpError.FORBIDDEN);
         }
     });
 });
@@ -82,7 +83,7 @@ router.patch(`${route}/:roomID`, function(req, res, next) {
     let roomID = req.params.roomID;
     let friendsID = req.body.friendsID;
     
-    if (!roomID || !userID || !friendsID || !(friendsID instanceof Array)) return res.sendStatus(400);
+    if (!roomID || !userID || !friendsID || !(friendsID instanceof Array)) return res.sendStatus(httpError.BAD_REQUEST);
 
     let errorMsg = '';
     friendsID.forEach(function(id, index) {
@@ -91,7 +92,7 @@ router.patch(`${route}/:roomID`, function(req, res, next) {
             return new Error();
         }
     });
-    if (errorMsg) return res.status(400).json(errorMsg);
+    if (errorMsg) return res.status(httpError.BAD_REQUEST).json(errorMsg);
 
     // Answer request.
     chatroom.isUserInRoom(userID, roomID, function(err, isInRoom) {
@@ -112,16 +113,16 @@ router.patch(`${route}/:roomID`, function(req, res, next) {
                             return err.code ? res.status(err.code).json(err.message) : next(err);
                         }
                         
-                        return res.sendStatus(200);
+                        return res.sendStatus(httpError.OK);
                     });
         
                 } else {
-                    return res.sendStatus(403);
+                    return res.sendStatus(httpError.FORBIDDEN);
                 }
             });
             
         } else {
-            return res.sendStatus(403);
+            return res.sendStatus(httpError.FORBIDDEN);
         }
     });
 });
@@ -140,20 +141,20 @@ let createChat = function(userID, friendsUsersID, roomName='', next) {
         
         if (!user) {
             err = new Error('user not found'); 
-            err.code = 404;
+            err.code = httpError.NOT_FOUND;
             return next(err);
         }
         
         if (friendsUsersID.indexOf(String(user.user_id)) !== -1) {
             err = new Error('user cannot be is own friend');
-            err.code = 400;
+            err.code = httpError.BAD_REQUEST;
             return next(err);
         }
 
         users.isValidUsers(friendsUsersID, function(err, isValid) {
             if (err || !isValid) {
                 err = new Error('some users does not exist');
-                err.code = 404;
+                err.code = httpError.NOT_FOUND;
                 return next(err);
             }
     
@@ -163,7 +164,7 @@ let createChat = function(userID, friendsUsersID, roomName='', next) {
     
                 if (chat) {
                     err = new Error('This chat already exists');
-                    err.code = 409;
+                    err.code = httpError.CONFLICT;
                     return next(err);
                 }
                 

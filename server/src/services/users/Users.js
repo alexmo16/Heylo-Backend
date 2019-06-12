@@ -1,5 +1,6 @@
 let bcrypt = require('bcryptjs');
 let userModel = require('../../models/UserModel');
+let httpError = require('../../utils/HttpError');
 
 const saltLength = 10;
 
@@ -78,7 +79,7 @@ module.exports = class Users {
                 newUser.save(function(err) {
                     if (err) {
                         if (err.code === 11000) {
-                            err.code = 409;
+                            err.code = httpError.CONFLICT;
                         }
                         return next(err, null);
                     }
@@ -91,7 +92,7 @@ module.exports = class Users {
             newUser.save(function(err) {
                 if (err) {
                     if (err.code === 11000) {
-                        err.code = 409;
+                        err.code = httpError.CONFLICT;
                     }
                     return next(err, null);
                 }
@@ -134,6 +135,7 @@ module.exports = class Users {
     static changeUserPassword(userID, newPassword, next) {
         if (!userID || typeof userID !== 'string' || !newPassword || typeof newPassword !== 'string') {
             let err = new Error('wrong parameters.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err, false);
         }
 

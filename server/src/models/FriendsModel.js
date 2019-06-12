@@ -1,4 +1,5 @@
 let mongoose = require('mongoose');
+let httpError = require('../utils/HttpError');
 
 let Schema = mongoose.Schema;
 
@@ -38,7 +39,7 @@ FriendsSchema.pre('validate', function(next) {
 
         if (res) {
             err = new Error('Recipient and requester combination must be unique.');
-            err.code = 400;
+            err.code = httpError.BAD_REQUEST;
             return next(err);
         }
         next();

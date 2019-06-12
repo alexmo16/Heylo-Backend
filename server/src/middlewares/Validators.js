@@ -1,6 +1,7 @@
 let GAuth = require('./GAuth');
 let HeyloAuth = require('./HeyloAuth');
 let users = require('../services/users/Users');
+let httpError = require('../utils/HttpError');
 
 /**
  * Function which validate if the user doing the request is allowed to talk to the server.
@@ -17,7 +18,7 @@ let validator = function(req, res, next) {
             let userID = payload.sub;
 
             users.findUserByID(userID, function(err) {
-                if (err) return res.sendStatus(401);
+                if (err) return res.sendStatus(httpError.UNAUTHORIZED);
                 
                 req.user = {
                     userID : userID,
@@ -29,13 +30,13 @@ let validator = function(req, res, next) {
             });
         }).catch(function (err) {
             process.stdout.write(`${err.message}\n`);
-            return res.sendStatus(401);
+            return res.sendStatus(httpError.UNAUTHORIZED);
         });
     } else {
         token = req.headers.h_token;
         if (token) {
             HeyloAuth.verify(token, function(err, payload) {
-                if (err) return res.sendStatus(401);
+                if (err) return res.sendStatus(httpError.UNAUTHORIZED);
 
                 if (req.connection.remoteAddress !== payload.ip) return res.sendStatus(401);
                 
@@ -48,7 +49,7 @@ let validator = function(req, res, next) {
                 return next();
             });
         } else {
-            return res.sendStatus(401);
+            return res.sendStatus(httpError.UNAUTHORIZED);
         }
     }
 };

@@ -1,5 +1,6 @@
 let blockUserModel = require('../../models/BlockUserModel').model;
 let blockStatus = require('../../models/BlockUserModel').blockStatus;
+let httpError = require('../../utils/HttpError');
 
 module.exports = class BlockUser {
     
@@ -13,6 +14,7 @@ module.exports = class BlockUser {
         let err;
         if (!requesterID || typeof requesterID !== 'string' || !aggressorID || typeof aggressorID !== 'string') {
             err = new Error('aggressor or requester is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
@@ -29,7 +31,7 @@ module.exports = class BlockUser {
 
             newBlockedUser.save(function(err) {
                 if (err && err.code === 11000) {
-                    err.code = 409;
+                    err.code = httpError.CONFLICT;
                 }
                 return next(err);
             });
@@ -46,6 +48,7 @@ module.exports = class BlockUser {
     static isBlocked(requesterID, aggressorID, next) {
         if (!requesterID || typeof requesterID !== 'string' || !aggressorID || typeof aggressorID !== 'string') {
             let err = new Error('requesterID or aggressorID is invalid.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err, false);
         }
 
@@ -70,6 +73,7 @@ module.exports = class BlockUser {
     static unblockUser(requesterID, aggressorID, next) {
         if (!requesterID || typeof requesterID !== 'string' || !aggressorID || typeof aggressorID !== 'string') {
             let err = new Error('data is missing.');
+            err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
 
