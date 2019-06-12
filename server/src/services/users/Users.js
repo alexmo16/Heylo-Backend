@@ -41,7 +41,7 @@ module.exports = class Users {
     /**
      * Validate that all users' IDs in usersID are real users' IDs.
      * @param {Array.<String>} usersID - User's ID.
-     * @param {function} next - Callback function.
+     * @param {function} next - Callback function (err, isValid).
      */
     static isValidUsers(usersID, next) {
         let isValid = true;

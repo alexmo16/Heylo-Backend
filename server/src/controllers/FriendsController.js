@@ -4,6 +4,7 @@ let router = express.Router();
 
 let friends = require('../services/friends/Friends');
 let users = require('../services/users/Users');
+let privacy = require('../services/blockuser/BlockUser');
 
 router.all('/friends*', validators.validator);
 
@@ -35,7 +36,19 @@ router.post('/friends', function(req, res, next) {
     users.isValidUsers([recipient, requester], function(err, isValid) {
         if (err) return next(err);
 
-        if (isValid) {
+        if (!isValid) {
+            return res.sendStatus(400);
+        }
+
+        privacy.isBlocked(recipient, requester, function(err, isBlocked) {
+            if (err) {
+                return err.code? res.status(err.code).json(err.message) : next(err);
+            }
+
+            if (isBlocked) {
+                return res.sendStatus(403);
+            }
+
             let data = {
                 recipient: recipient,
                 requester: requester
@@ -45,11 +58,8 @@ router.post('/friends', function(req, res, next) {
                     return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
                 return res.sendStatus(201);
-            }); 
-
-        } else {
-            return res.sendStatus(400);
-        }
+            });
+        });
     });
 });
 
