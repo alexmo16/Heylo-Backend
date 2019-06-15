@@ -6,7 +6,7 @@ let users = require('../services/users/Users');
 let blockUser = require('../services/blockuser/BlockUser');
 let httpError = require('../utils/HttpError');
 
-router.all('/privacy/block_user*', validators.validator);
+router.all('/privacy/*', validators.validator);
 
 
 router.post('/privacy/block_user', function(req, res, next) {
