@@ -10,7 +10,7 @@ router.all('/privacy/block_user*', validators.validator);
 
 
 router.post('/privacy/block_user', function(req, res, next) {
-    let userID = req.userID;
+    let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
@@ -47,7 +47,7 @@ router.post('/privacy/block_user', function(req, res, next) {
 
 
 router.delete('/privacy/block_user', function(req, res, next) {
-    let userID = req.userID;
+    let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
