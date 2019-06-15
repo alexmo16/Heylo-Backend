@@ -26,6 +26,6 @@ Heylo is a mobile secure chat application, and this is the Back-End. (STILL IN D
 
         $ npm run start
 
-9. Run server in debug:
+9. Run server in debug (setup your IDE/Editor to execute this command when debugging):
 
         $ npm run debug
