@@ -1,6 +1,6 @@
 # Heylo
 
-Heylo is a mobile secure chat application, and this is the backend.
+Heylo is a mobile secure chat application, and this is the backend. (STILL IN DEVELOPMENT)
 
 ## Installation
 
