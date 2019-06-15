@@ -7,7 +7,7 @@ const saltLength = 10;
 module.exports = class Users {
     
     /**
-     * Find a user by is user ID, not the ObjectID of MongoDB.
+     * Find a user with his user ID, not the ObjectID of MongoDB.
      * @param {String} userID - User's ID.
      * @param {function} next - Callback function.
      */
@@ -26,7 +26,7 @@ module.exports = class Users {
 
 
     /**
-     * Find a user by is email.
+     * Find a user with his email.
      * @param {String} email - User's email.
      * @param {function} next - Callback function.
      */
