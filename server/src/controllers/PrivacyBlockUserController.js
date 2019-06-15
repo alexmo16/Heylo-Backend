@@ -59,7 +59,7 @@ router.delete('/privacy/block_user', function(req, res, next) {
         }
 
         if (!isBlocked) {
-            return res.sendStatus(403);
+            return res.sendStatus(httpError.FORBIDDEN);
         }
 
         blockUser.unblockUser(userID, aggressorID, function(err) {
