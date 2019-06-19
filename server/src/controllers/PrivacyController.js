@@ -6,11 +6,11 @@ let users = require('../services/users/Users');
 let blockUser = require('../services/blockuser/BlockUser');
 let httpError = require('../utils/HttpError');
 
-router.all('/privacy/block_user*', validators.validator);
+router.all('/privacy/*', validators.validator);
 
 
 router.post('/privacy/block_user', function(req, res, next) {
-    let userID = req.userID;
+    let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
@@ -47,7 +47,7 @@ router.post('/privacy/block_user', function(req, res, next) {
 
 
 router.delete('/privacy/block_user', function(req, res, next) {
-    let userID = req.userID;
+    let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
@@ -59,7 +59,7 @@ router.delete('/privacy/block_user', function(req, res, next) {
         }
 
         if (!isBlocked) {
-            return res.sendStatus(403);
+            return res.sendStatus(httpError.FORBIDDEN);
         }
 
         blockUser.unblockUser(userID, aggressorID, function(err) {

@@ -9,6 +9,7 @@ module.exports = function(app) {
         gauthTestController : require('./src/controllers/GAuthTestController'),
         friendsController : require('./src/controllers/FriendsController'),
         passwordController : require('./src/controllers/PasswordController'),
+        privacyController : require('./src/controllers/PrivacyController')
     }
 
     Object.keys(controllers).forEach(function(controllerName) {

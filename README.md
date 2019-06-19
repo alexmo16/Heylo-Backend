@@ -1,5 +1,7 @@
 # Heylo
 
+Heylo is a mobile secure chat application, and this is the Back-End. (STILL IN DEVELOPMENT)
+
 ## Installation
 
 1. Install latest stable nodejs version.
@@ -18,8 +20,12 @@
 
         $ npm install
 
-7. Ask another dev to get the config folder and sslcert folder (it contains secrets, so it's not in the repo).
+7. Config folder and sslcert folder contain secrets, so there are not in the repo.
 
-8. run server:
+8. Run server:
 
         $ npm run start
+
+9. Run server in debug (setup your IDE/Editor to execute this command when debugging):
+
+        $ npm run debug
