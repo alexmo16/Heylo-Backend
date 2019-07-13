@@ -12,4 +12,18 @@ module.exports = class Utils {
         });
         return token;
     }
+
+    /**
+     * Verify if a string is formatted for json.
+     * @param {String} str String to verify.
+     * @returns {Boolean} Json or not.
+     */
+    static isJsonString(str) {
+        try {
+            let json = JSON.parse(str);
+            return (typeof json === 'object');
+        } catch {
+            return false;
+        }
+    }
 };
