@@ -14,7 +14,7 @@ let https = require('https');
 let fs = require('fs');
 
 let app = require('../app');
-let socketIOHandler = require('../src/websockets/SocketIOHandler');
+let SocketIO = require('../src/websockets/SocketIO');
 
 /**
  * Get port from environment and store in Express.
@@ -106,5 +106,5 @@ function onListening() {
 }
 
 let io = require('socket.io')(server);
-new socketIOHandler(io);
+let socketIO = new SocketIO(io);
 process.stdout.write('server is ready...\n');
