@@ -11,18 +11,18 @@ let httpError = require('../utils/HttpError');
  * @param {Object} res - res object from Express framework.
  * @param {Function} next - Callback function
  */
-let validator = function(req, res, next) {
+let validator = function (req, res, next) {
     let token = req.headers.g_token;
     if (token) {
-        GAuth.verify(token, function(payload) {
+        GAuth.verify(token, function (payload) {
             let userID = payload.sub;
 
-            users.findUserByID(userID, function(err) {
+            users.findUserByID(userID, function (err) {
                 if (err) return res.sendStatus(httpError.UNAUTHORIZED);
-                
+
                 req.user = {
-                    userID : userID,
-                    userPayload : payload,
+                    userID: userID,
+                    userPayload: payload,
                     registeredBy: 'GOOGLE'
                 };
                 process.stdout.write('validated user\n');
@@ -35,15 +35,15 @@ let validator = function(req, res, next) {
     } else {
         token = req.headers.h_token;
         if (token) {
-            HeyloAuth.verify(token, function(err, payload) {
+            HeyloAuth.verify(token, function (err, payload) {
                 if (err) return res.sendStatus(httpError.UNAUTHORIZED);
 
                 if (req.connection.remoteAddress !== payload.ip) return res.sendStatus(401);
-                
+
                 process.stdout.write('validated user\n');
                 req.user = {
-                    userID : payload.user_id,
-                    userPayload : payload,
+                    userID: payload.user_id,
+                    userPayload: payload,
                     registeredBy: 'HEYLO'
                 };
                 return next();
@@ -61,14 +61,14 @@ let validator = function(req, res, next) {
  * @param {Object} res - res object from Express framework.
  * @param {Function} next - Callback function
  */
-let registrationValidator = function(req, res, next) {
+let registrationValidator = function (req, res, next) {
     let token = req.headers.g_token;
 
     if (token) {
-        GAuth.verify(token, function(userPayload) {
+        GAuth.verify(token, function (userPayload) {
             req.userPayload = userPayload;
             return next();
-    
+
         }).catch(function (err) {
             return res.sendStatus(401);
         });

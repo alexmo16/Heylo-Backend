@@ -28,13 +28,13 @@ let FriendsSchema = new Schema({
     }
 });
 
-FriendsSchema.pre('validate', function(next) {
+FriendsSchema.pre('validate', function (next) {
     let query = {
-        recipient: this.recipient, 
+        recipient: this.recipient,
         requester: this.requester
     };
 
-    model.findOne(query, function(err, res) {
+    model.findOne(query, function (err, res) {
         if (err) return next(err);
 
         if (res) {

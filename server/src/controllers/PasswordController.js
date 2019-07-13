@@ -9,16 +9,16 @@ router.all('/password*', validators.validator);
 
 
 // Change a user's password.
-router.put('/password', function(req, res, next) {
+router.put('/password', function (req, res, next) {
     // Validate query.
     let userID = req.user.userID;
     let newPassword = req.body.newPassword;
-    if (!userID || !newPassword ||  typeof newPassword !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
+    if (!userID || !newPassword || typeof newPassword !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
     if (req.user.registeredBy !== 'HEYLO') return res.sendStatus(httpError.FORBIDDEN);
 
     // Answer query.
-    users.changeUserPassword(userID, newPassword, function(err, isPasswordChanged) {
-        if (err)  {
+    users.changeUserPassword(userID, newPassword, function (err, isPasswordChanged) {
+        if (err) {
             return err.code ? res.status(err.code).json(err.message) : next(err);
         }
 
@@ -26,7 +26,7 @@ router.put('/password', function(req, res, next) {
             return res.sendStatus(httpError.OK);
         }
 
-        return res.sendStatus(httpError.INTERNAL_SERVER_ERROR); 
+        return res.sendStatus(httpError.INTERNAL_SERVER_ERROR);
     });
 });
 

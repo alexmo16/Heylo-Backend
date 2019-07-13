@@ -8,11 +8,11 @@ let httpError = require('../utils/HttpError');
 router.all('/user*', validators.validator);
 
 
-router.get('/user', function(req, res, next) {
+router.get('/user', function (req, res, next) {
     if (!req.userID) return res.sendStatus(httpError.INTERNAL_SERVER_ERROR);
 
     let userID = req.user.userID;
-    users.findUserByID(userID, function(err, user) {
+    users.findUserByID(userID, function (err, user) {
         if (err) return next(err);
 
         if (!user) return res.status(httpError.NOT_FOUND).json('user not found');
@@ -24,7 +24,7 @@ router.get('/user', function(req, res, next) {
             creation_date: user.creation_date
         };
 
-        return res.status(httpError.OK).json(responseJson); 
+        return res.status(httpError.OK).json(responseJson);
     });
 });
 

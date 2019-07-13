@@ -10,7 +10,7 @@ let httpError = require('../utils/HttpError');
 router.all('/friends*', validators.validator);
 
 
-router.get('/friends/:friendID', function(req, res, next) {
+router.get('/friends/:friendID', function (req, res, next) {
     let requester = req.user.userID;
     let friendID = req.params['friendID'];
     if (!friendID || !requester) return res.sendStatus(httpError.BAD_REQUEST);
@@ -19,31 +19,31 @@ router.get('/friends/:friendID', function(req, res, next) {
         requester: requester,
         friend: friendID
     };
-    friends.findFriendsRelation(data, function(err, relation) {
+    friends.findFriendsRelation(data, function (err, relation) {
         if (err) {
             return err.code ? res.status(err.code).json(err.message) : next(err);
         }
-        
+
         return res.status(httpError.OK).json(relation);
     });
 });
 
 
-router.post('/friends', function(req, res, next) {
+router.post('/friends', function (req, res, next) {
     let recipient = req.body.recipient;
     let requester = req.user.userID;
     if (!recipient || !requester || !typeof recipient === 'string') return res.sendStatus(httpError.BAD_REQUEST);
 
-    users.isValidUsers([recipient, requester], function(err, isValid) {
+    users.isValidUsers([recipient, requester], function (err, isValid) {
         if (err) return next(err);
 
         if (!isValid) {
             return res.sendStatus(httpError.BAD_REQUEST);
         }
 
-        privacy.isBlocked(recipient, requester, function(err, isBlocked) {
+        privacy.isBlocked(recipient, requester, function (err, isBlocked) {
             if (err) {
-                return err.code? res.status(err.code).json(err.message) : next(err);
+                return err.code ? res.status(err.code).json(err.message) : next(err);
             }
 
             if (isBlocked) {
@@ -54,7 +54,7 @@ router.post('/friends', function(req, res, next) {
                 recipient: recipient,
                 requester: requester
             };
-            friends.createFriendsRelation(data, function(err) {
+            friends.createFriendsRelation(data, function (err) {
                 if (err) {
                     return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
@@ -65,21 +65,21 @@ router.post('/friends', function(req, res, next) {
 });
 
 
-router.put('/friends/:relationID', function(req, res, next) {
+router.put('/friends/:relationID', function (req, res, next) {
     let relationID = req.params['relationID'];
     let userID = req.user.userID;
     if (!relationID || !userID) return res.sendStatus(httpError.BAD_REQUEST);
 
-    friends.isRecipient(relationID, userID, function(err, isRecipient) {
+    friends.isRecipient(relationID, userID, function (err, isRecipient) {
         if (err) return next(err);
 
         if (isRecipient) {
-            friends.acceptFriendRequest(relationID, function(err) {
+            friends.acceptFriendRequest(relationID, function (err) {
                 if (err) return next(err);
 
                 return res.sendStatus(httpError.OK);
             });
-            
+
         } else {
             return res.sendStatus(httpError.FORBIDDEN);
         }
@@ -87,21 +87,21 @@ router.put('/friends/:relationID', function(req, res, next) {
 });
 
 
-router.delete('/friends/:relationID', function(req, res, next) {
+router.delete('/friends/:relationID', function (req, res, next) {
     let relationID = req.params['relationID'];
     let userID = req.user.userID;
     if (!relationID || !userID) return res.sendStatus(httpError.BAD_REQUEST);
 
-    friends.isInRelation(relationID, userID, function(err, hasRelationRights) {
+    friends.isInRelation(relationID, userID, function (err, hasRelationRights) {
         if (err) return next(err);
 
         if (hasRelationRights) {
-            friends.deleteFriendsRelation(relationID, function(err) {
+            friends.deleteFriendsRelation(relationID, function (err) {
                 if (err) return next(err);
 
                 return res.sendStatus(httpError.OK);
             });
-            
+
         } else {
             return res.sendStatus(httpError.FORBIDDEN);
         }

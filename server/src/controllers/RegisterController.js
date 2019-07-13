@@ -8,13 +8,13 @@ let users = require('../services/users/users');
 let utils = require('../utils/Utils');
 let httpError = require('../utils/HttpError');
 
-router.get('/register', function(req, res, next) {
+router.get('/register', function (req, res, next) {
     res.sendFile(path.join(__dirname, '../../public', 'register.html'));
 });
 
 
 // create a new user
-router.post('/register', validators.registrationValidator, function(req, res, next) {
+router.post('/register', validators.registrationValidator, function (req, res, next) {
     let googleUserInfo = req.user.userPayload;
     if (googleUserInfo && (!googleUserInfo.family_name || !googleUserInfo.given_name || !googleUserInfo.sub)) return res.status(httpError.INTERNAL_SERVER_ERROR).json(`unable to get user's informations.`);
 
@@ -32,8 +32,8 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
     };
 
 
-    users.createUser(userData, function(err, newUser) {
-        if (err)  {
+    users.createUser(userData, function (err, newUser) {
+        if (err) {
             return err.code === httpError.CONFLICT ? res.status(err.code).json('this user already exists, try again') : next(err);
         }
 
@@ -47,7 +47,7 @@ router.post('/register', validators.registrationValidator, function(req, res, ne
 
         // This mean the user used our password system, so we need to create our own jwt.
         if (newUser.password) {
-            responseData.jwt = utils.createToken({email: newUser.email, user_id: newUser.user_id, ip: req.connection.remoteAddress});
+            responseData.jwt = utils.createToken({ email: newUser.email, user_id: newUser.user_id, ip: req.connection.remoteAddress });
         }
 
         return res.status(httpError.CREATED).json(responseData);

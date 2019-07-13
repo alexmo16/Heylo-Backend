@@ -5,21 +5,21 @@ let httpError = require('../../utils/HttpError');
 const saltLength = 10;
 
 module.exports = class Users {
-    
+
     /**
      * Find a user with his user ID, not the ObjectID of MongoDB.
      * @param {String} userID - User's ID.
      * @param {function} next - Callback function.
      */
     static findUserByID(userID, next) {
-        userModel.findOne({user_id: userID}, function(err, user) {
+        userModel.findOne({ user_id: userID }, function (err, user) {
             if (err) return next(err, null);
-    
+
             if (!user) {
                 err = new Error('User not found.');
                 return next(err, null);
             }
-    
+
             return next(err, user);
         });
     }
@@ -31,7 +31,7 @@ module.exports = class Users {
      * @param {function} next - Callback function.
      */
     static findUserByEmail(email, next) {
-        userModel.findOne({email: email}, function(err, user) {
+        userModel.findOne({ email: email }, function (err, user) {
             if (err) return next(err, null);
 
             return next(err, user);
@@ -51,13 +51,13 @@ module.exports = class Users {
                 $in: usersID
             }
         };
-        userModel.find(query, function(err, users) {
+        userModel.find(query, function (err, users) {
             if (err) return next(err, null);
 
             if (users.length === usersID.length) {
                 return next(err, isValid);
             }
-            
+
             isValid = false;
             return next(err, isValid);
         });
@@ -71,12 +71,12 @@ module.exports = class Users {
      */
     static createUser(userData, next) {
         if (userData.password) {
-            bcrypt.hash(userData.password, saltLength, function(err, hash) {
+            bcrypt.hash(userData.password, saltLength, function (err, hash) {
                 if (err) return next(err);
-    
+
                 userData.password = hash;
                 let newUser = new userModel(userData);
-                newUser.save(function(err) {
+                newUser.save(function (err) {
                     if (err) {
                         if (err.code === 11000) {
                             err.code = httpError.CONFLICT;
@@ -89,7 +89,7 @@ module.exports = class Users {
             });
         } else {
             let newUser = new userModel(userData);
-            newUser.save(function(err) {
+            newUser.save(function (err) {
                 if (err) {
                     if (err.code === 11000) {
                         err.code = httpError.CONFLICT;
@@ -113,14 +113,14 @@ module.exports = class Users {
         let data = {
             username: new RegExp(triedUsername, 'i')
         };
-    
-        userModel.find(data, function(err, users) {
+
+        userModel.find(data, function (err, users) {
             if (err) return next(err, null);
 
             if (top && Number.isInteger(top)) {
                 users.splice(0, top);
             }
-    
+
             return next(err, users);
         }).select('-_id -creation_date -__v');
     }
@@ -139,17 +139,17 @@ module.exports = class Users {
             return next(err, false);
         }
 
-        bcrypt.hash(newPassword, saltLength, function(err, hash) {
+        bcrypt.hash(newPassword, saltLength, function (err, hash) {
             if (err) return next(err, false);
 
             let query = {
                 'user_id': userID
             };
-            userModel.findOneAndUpdate(query, { password : hash }, { new: true }, function(err, user) {
+            userModel.findOneAndUpdate(query, { password: hash }, { new: true }, function (err, user) {
                 if (err) return next(err, false);
-    
+
                 return next(err, user.password === hash);
             });
-        }); 
+        });
     };
 };

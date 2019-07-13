@@ -9,24 +9,24 @@ let httpError = require('../utils/HttpError');
 router.all('/privacy/*', validators.validator);
 
 
-router.post('/privacy/block_user', function(req, res, next) {
+router.post('/privacy/block_user', function (req, res, next) {
     let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
     if (!aggressorID || typeof aggressorID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
 
-    users.isValidUsers( [ userID, aggressorID ], function(err, isValid) {
-        if (err)  {
+    users.isValidUsers([userID, aggressorID], function (err, isValid) {
+        if (err) {
             return err.code ? res.status(err.code).json(err.message) : next(err);
         }
 
-        if ( !isValid ) {
+        if (!isValid) {
             return res.sendStatus(httpError.BAD_REQUEST);
         }
 
-        blockUser.isBlocked( userID, aggressorID, function(err, isBlocked) {
-            if (err)  {
+        blockUser.isBlocked(userID, aggressorID, function (err, isBlocked) {
+            if (err) {
                 return err.code ? res.status(err.code).json(err.message) : next(err);
             }
 
@@ -34,27 +34,27 @@ router.post('/privacy/block_user', function(req, res, next) {
                 return res.sendStatus(httpError.CONFLICT);
             }
 
-            blockUser.blockUser(userID, aggressorID, function(err) {
+            blockUser.blockUser(userID, aggressorID, function (err) {
                 if (err) {
                     return err.code ? res.status(err.code).json(err.message) : next(err);
                 }
 
                 return res.sendStatus(httpError.CREATED);
             });
-        } );
+        });
     });
 });
 
 
-router.delete('/privacy/block_user', function(req, res, next) {
+router.delete('/privacy/block_user', function (req, res, next) {
     let userID = req.user.userID;
     let aggressorID = req.body.aggressorID;
 
     if (!userID || typeof userID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
     if (!aggressorID || typeof aggressorID !== 'string') return res.sendStatus(httpError.BAD_REQUEST);
 
-    blockUser.isBlocked( userID, aggressorID, function(err, isBlocked) {
-        if (err)  {
+    blockUser.isBlocked(userID, aggressorID, function (err, isBlocked) {
+        if (err) {
             return err.code ? res.status(err.code).json(err.message) : next(err);
         }
 
@@ -62,7 +62,7 @@ router.delete('/privacy/block_user', function(req, res, next) {
             return res.sendStatus(httpError.FORBIDDEN);
         }
 
-        blockUser.unblockUser(userID, aggressorID, function(err) {
+        blockUser.unblockUser(userID, aggressorID, function (err) {
             if (err) {
                 return err.code ? res.status(err.code).json(err.message) : next(err);
             }

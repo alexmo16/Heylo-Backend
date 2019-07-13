@@ -3,7 +3,7 @@ let friendshipStatus = require('../../models/FriendsModel').friendshipStatus;
 let httpError = require('../../utils/HttpError');
 
 module.exports = class Friends {
-    
+
     /**
      * Create a new friendship in the database. The friendship will be set as PENDING and the
      * recipient will have to accept the new friendship to change the status to ACCEPTED.
@@ -18,13 +18,13 @@ module.exports = class Friends {
             return next(err);
         }
 
-        relationData.status = friendshipStatus.PENDING; 
+        relationData.status = friendshipStatus.PENDING;
 
         let newFriends = new friendsModel(relationData);
-        newFriends.validate(function(err) {
+        newFriends.validate(function (err) {
             if (err) return next(err);
 
-            newFriends.save(function(err) {
+            newFriends.save(function (err) {
                 if (err && err.code === 11000) {
                     err.code = httpError.CONFLICT;
                 }
@@ -58,10 +58,10 @@ module.exports = class Friends {
                     'requester': relationData.friend,
                     'recipient': relationData.requester
                 }
-            ] 
+            ]
         };
 
-        friendsModel.findOne(query, function(err, result) {
+        friendsModel.findOne(query, function (err, result) {
             if (err) return next(err);
 
             if (!result) {
@@ -69,7 +69,7 @@ module.exports = class Friends {
                 err.code = httpError.NOT_FOUND;
                 return next(err, null);
             }
-    
+
             return next(err, result);
         }).select('-__v');
     };
@@ -97,9 +97,9 @@ module.exports = class Friends {
                 {
                     'recipient': userID
                 }
-            ]            
+            ]
         };
-        friendsModel.findOne(query, function(err, result) {
+        friendsModel.findOne(query, function (err, result) {
             if (err) return next(err);
 
             let isInRoom = result ? true : false;
@@ -123,9 +123,9 @@ module.exports = class Friends {
 
         let query = {
             '_id': relationID,
-            'recipient': userID          
+            'recipient': userID
         };
-        friendsModel.findOne(query, function(err, result) {
+        friendsModel.findOne(query, function (err, result) {
             if (err) return next(err);
 
             let isInRoom = result ? true : false;
@@ -145,7 +145,7 @@ module.exports = class Friends {
             err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
-        friendsModel.findByIdAndDelete(relationID, function(err) {
+        friendsModel.findByIdAndDelete(relationID, function (err) {
             next(err);
         });
     };
@@ -165,7 +165,7 @@ module.exports = class Friends {
         let relationUpdate = {
             'status': friendshipStatus.ACCEPTED
         };
-        friendsModel.findByIdAndUpdate(relationID, relationUpdate, function(err) {
+        friendsModel.findByIdAndUpdate(relationID, relationUpdate, function (err) {
             next(err);
         });
     }
@@ -183,7 +183,7 @@ module.exports = class Friends {
             err.code = httpError.INTERNAL_SERVER_ERROR;
             return next(err);
         }
-        
+
         let query = {
             $and: [
                 {
@@ -207,7 +207,7 @@ module.exports = class Friends {
                 }
             ]
         };
-        friendsModel.find(query, function(err, relations) {
+        friendsModel.find(query, function (err, relations) {
             if (err) return next(err);
 
             return next(err, relations && relations.length === friendsID.length);
