@@ -3,7 +3,7 @@ let blockStatus = require('../../models/BlockUserModel').blockStatus;
 let httpError = require('../../utils/HttpError');
 
 module.exports = class BlockUser {
-    
+
     /**
      * Create a block relation between 2 users in the database.
      * @param {String} requesterID - requester user ID.
@@ -26,10 +26,10 @@ module.exports = class BlockUser {
         };
 
         let newBlockedUser = new blockUserModel(data);
-        newBlockedUser.validate(function(err) {
+        newBlockedUser.validate(function (err) {
             if (err) return next(err);
 
-            newBlockedUser.save(function(err) {
+            newBlockedUser.save(function (err) {
                 if (err && err.code === 11000) {
                     err.code = httpError.CONFLICT;
                 }
@@ -57,7 +57,7 @@ module.exports = class BlockUser {
             'aggressor': aggressorID,
             'status': blockStatus.BLOCKED
         };
-        blockUserModel.findOne(query, function(err, result) {
+        blockUserModel.findOne(query, function (err, result) {
             if (err) return next(err, false);
             next(err, result);
         });
@@ -83,7 +83,7 @@ module.exports = class BlockUser {
             'status': blockStatus.BLOCKED
         };
 
-        blockUserModel.findOneAndDelete(query, function(err) {
+        blockUserModel.findOneAndDelete(query, function (err) {
             next(err);
         });
     };

@@ -1,4 +1,4 @@
-module.exports = function(socket, data, next) {
+module.exports = function (socket, data, next) {
     // Check for data integrity and if the socket is allowed
     // to talk to the desired room.
     try {
@@ -10,11 +10,11 @@ module.exports = function(socket, data, next) {
                 throw new Error('Access denied.');
             }
         } else {
-            throw new Error('cannot send your message.');   
+            throw new Error('cannot send your message.');
         }
     } catch (err) {
         process.stdout.write(`Error: ${err.message}\n`);
         next(JSON.stringify(err));
         return;
-    }            
+    }
 };

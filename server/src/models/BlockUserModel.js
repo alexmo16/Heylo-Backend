@@ -26,13 +26,13 @@ let blockUserSchema = new Schema({
     }
 });
 
-blockUserSchema.pre('validate', function(next) {
+blockUserSchema.pre('validate', function (next) {
     let query = {
-        aggressor: this.aggressor, 
+        aggressor: this.aggressor,
         requester: this.requester
     };
 
-    model.findOne(query, function(err, res) {
+    model.findOne(query, function (err, res) {
         if (err) return next(err);
 
         if (res) {

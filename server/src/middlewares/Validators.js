@@ -11,18 +11,22 @@ let httpError = require('../utils/HttpError');
  * @param {Object} res - res object from Express framework.
  * @param {Function} next - Callback function
  */
-let validator = function(req, res, next) {
+let validator = function (req, res, next) {
     let token = req.headers.g_token;
     if (token) {
-        GAuth.verify(token, function(payload) {
+        GAuth.verify(token, function (payload) {
             let userID = payload.sub;
 
-            users.findUserByID(userID, function(err) {
-                if (err) return res.sendStatus(httpError.UNAUTHORIZED);
-                
+            users.findUserByID(userID, function (err) {
+                if (err) {
+                    let error = Error('Unauthorized');
+                    error.status = httpError.UNAUTHORIZED;
+                    return next(error);
+                }
+
                 req.user = {
-                    userID : userID,
-                    userPayload : payload,
+                    userID: userID,
+                    userPayload: payload,
                     registeredBy: 'GOOGLE'
                 };
                 process.stdout.write('validated user\n');
@@ -30,26 +34,32 @@ let validator = function(req, res, next) {
             });
         }).catch(function (err) {
             process.stdout.write(`${err.message}\n`);
-            return res.sendStatus(httpError.UNAUTHORIZED);
+            let error = Error('Unauthorized');
+            error.status = httpError.UNAUTHORIZED;
+            return next(error);
         });
     } else {
         token = req.headers.h_token;
         if (token) {
-            HeyloAuth.verify(token, function(err, payload) {
-                if (err) return res.sendStatus(httpError.UNAUTHORIZED);
+            HeyloAuth.verify(token, function (err, payload) {
+                if (err) {
+                    let error = Error('Unauthorized');
+                    error.status = httpError.UNAUTHORIZED;
+                    return next(error);
+                }
 
-                if (req.connection.remoteAddress !== payload.ip) return res.sendStatus(401);
-                
                 process.stdout.write('validated user\n');
                 req.user = {
-                    userID : payload.user_id,
-                    userPayload : payload,
+                    userID: payload.user_id,
+                    userPayload: payload,
                     registeredBy: 'HEYLO'
                 };
                 return next();
             });
         } else {
-            return res.sendStatus(httpError.UNAUTHORIZED);
+            let error = Error('Unauthorized');
+            error.status = httpError.UNAUTHORIZED;
+            return next(error);
         }
     }
 };
@@ -58,19 +68,18 @@ let validator = function(req, res, next) {
 /**
  * Custom validatior for the registration route, all others routes shall call the default validator function.
  * @param {Object} req - req object from Express framework.
- * @param {Object} res - res object from Express framework.
  * @param {Function} next - Callback function
  */
-let registrationValidator = function(req, res, next) {
+let registrationValidator = function (req, next) {
     let token = req.headers.g_token;
 
     if (token) {
-        GAuth.verify(token, function(userPayload) {
+        GAuth.verify(token, function (userPayload) {
             req.userPayload = userPayload;
             return next();
-    
+
         }).catch(function (err) {
-            return res.sendStatus(401);
+            return next(401);
         });
     } else {
         return next();

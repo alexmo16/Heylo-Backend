@@ -60,11 +60,11 @@
     <div style="display: inline-flex; margin-top: 20px;">
         <div style="margin-right: 15px;">
             <label>room id :</label>
-            <input id="roomid"/>
+            <input id="roomid" />
         </div>
         <div>
             <label>user id :</label>
-            <input id="userid"/>
+            <input id="userid" />
         </div>
         <button onclick="joinRoom()" style="margin-left: 15px;">join room</button>
     </div>
@@ -77,7 +77,36 @@
     <script>
         let socket;
         $(function () {
-            socket = io('wss://localhost:4343/');
+            socket = io('wss://localhost:4343/', {
+                transportOptions: {
+                    websocket: {
+                        extraHeaders: {
+                            'h_token': 'TOKEN'
+                        }
+                    },
+                    polling: {
+                        extraHeaders: {
+                            'h_token': 'TOKEN'
+                        }
+                    }
+                }
+            });
+
+            // on reconnection, reset the transports option, as the Websocket
+            // connection may have failed (caused by proxy, firewall, browser, ...)
+            socket.on('reconnect_attempt', () => {
+                socket.io.opts.transports = ['polling', 'websocket'];
+            });
+
+            socket.on('error', function (err) {
+                console.log(`Connection failed: ${err}`);
+                $('#messages').append($('<li>').text("CONNECTION FAILED"));
+            });
+
+            socket.on('connect', function () {
+                $('#messages').append($('<li>').text("CONNECTION DONE!"));
+            });
+
             $('form').submit(function () {
                 let data = {
                     room: $('#roomid').val(),
@@ -102,7 +131,7 @@
             socket.emit('join', data, function (err) {
                 if (err) {
                     return console.log(err);
-                } 
+                }
 
                 // Unsubscribe from an event
                 socket.removeAllListeners('message');

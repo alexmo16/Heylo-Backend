@@ -1,4 +1,4 @@
-module.exports = function(socket, data, next) {
+module.exports = function (socket, data, next) {
     if (data && data.room) {
         if (socket.rooms[data.room]) {
             socket.leave(data.room);
