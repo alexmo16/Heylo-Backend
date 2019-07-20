@@ -5,9 +5,6 @@ let handleMessage = require('./events/Message');
 let validators = require('../middlewares/Validators');
 let httpError = require('../utils/HttpError');
 
-
-/** valider l'origine et etc. */
-
 module.exports = class SocketIO {
     constructor(io) {
 

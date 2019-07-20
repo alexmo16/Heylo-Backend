@@ -4,11 +4,6 @@
  * Module dependencies.
  */
 
-if (process.env.production) {
-    require('dotenv').config({ path: 'config/production/.env' });
-} else {
-    require('dotenv').config({ path: 'config/development/.env' });
-}
 let debug = require('debug')('heylo:server');
 let https = require('https');
 let fs = require('fs');
@@ -106,5 +101,13 @@ function onListening() {
 }
 
 let io = require('socket.io')(server);
+
+/** Configuration time */
+if (!process.env.ORIGIN || typeof process.env.ORIGIN !== 'string' ) {
+    process.stdout.write('server error: bad origins.');
+    process.exit();
+}
+io.origins([process.env.ORIGIN]);
+
 let socketIO = new SocketIO(io);
 process.stdout.write('server is ready...\n');

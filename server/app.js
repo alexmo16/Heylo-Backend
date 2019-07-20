@@ -3,8 +3,10 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let helmet = require('helmet');
+let cors = require('cors');
 
-let db = require('./db');
+require('./env');
+require('./db');
 let routes = require('./routes');
 let app = express();
 
@@ -19,6 +21,9 @@ app.use(helmet({
     frameguard: {
         action: 'deny'
     }
+}));
+app.use(cors({
+    origin: process.env.ORIGIN
 }));
 
 // Connect all our routes to our application.
