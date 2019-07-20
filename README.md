@@ -22,9 +22,9 @@ Heylo is a mobile secure chat application, and this is the Back-End. (STILL IN D
 
 7. Config folder and sslcert folder contain secrets, so there are not in the repo.
 
-8. Run server:
+8. Run server in development:
 
-        $ npm run start
+        $ npm run dev
 
 9. Run server in debug (setup your IDE/Editor to execute this command when debugging):
 
