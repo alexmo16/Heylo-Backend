@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node ./bin/www production=true",
-    "start": "node_modules/.bin/nodemon ./bin/www",
-    "debug": "node_modules/.bin/nodemon --inspect-brk=9229 ./bin/www"
+    "prod": "SET \"NODE_ENV=production\" && node ./bin/www",
+    "dev": "node_modules/.bin/nodemon ./bin/www",
+    "debug": "$env:NODE_ENV=production node_modules/.bin/nodemon --inspect-brk=9229 ./bin/www"
   },
   "dependencies": {
     "async": "^2.6.2",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^6.2.0",
+    "errorhandler": "^1.5.1",
     "express": "~4.16.0",
     "fs": "0.0.1-security",
     "google-auth-library": "^4.2.2",
