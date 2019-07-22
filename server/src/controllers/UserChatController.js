@@ -1,6 +1,7 @@
 let express = require('express');
 let validators = require('../middlewares/Validators');
 let router = express.Router();
+let { validationResult, check, sanitizeBody, param, body } = require('express-validator');
 
 let users = require('../services/users/Users');
 let chatroom = require('../services/chat/ChatRoom');
@@ -9,10 +10,70 @@ let httpError = require('../utils/HttpError');
 
 let route = '/user/chats';
 
+/**
+ * Validate inputs for the UserChatController.
+ * @param {String} method methods name to validate inputs */
+let __validate = function (method) {
+    switch (method) {
+        case 'get': {
+            return [];
+        }
+
+        case 'post': {
+            return [
+                check('friendsID').exists().isArray().custom(function (value) {
+                    return __isValuesUnique(value);
+                }),
+                sanitizeBody('friendsID.*').trim().escape(),
+                check('roomName').optional().isString().not().isEmpty().trim().escape()
+            ];
+        }
+
+        case 'patch': {
+            return [
+                body('friendsID', 'invalid input').exists().isArray().custom(function (value) {
+                    return __isValuesUnique(value);
+                }),
+                sanitizeBody('friendsID.*').trim().escape(),
+                param('roomID', 'invalid room').exists().not().isEmpty(),
+                param('roomID', 'invalid room').exists().isString().trim().isMongoId(),
+            ];
+        }
+    }
+};
+
+
+/**
+ * Evaluate if there is no duplicate of values in a given array.
+ * @param {Array} array array to evaluate
+ */
+let __isValuesUnique = function(array) {
+    if (!array) {
+        throw new Error('Invalid input');
+    }
+    let isInvalidInput = false;
+    array.forEach(function (objectID, index) {
+        if (array.indexOf(objectID) !== -1 && array.indexOf(objectID) !== index) {
+            isInvalidInput = true;
+        }
+    });
+    if (isInvalidInput) {
+        throw new Error('Duplicate of values');
+    }
+
+    return true;
+};
+
+
 router.all(`${route}*`, validators.validator);
 
 
-router.get(route, function (req, res, next) {
+router.get(route, __validate('get'), function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(httpError.BAD_REQUEST).json({ errors: errors.array() });
+        return;
+    }
     let userID = req.user.userID;
     if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
 
@@ -32,24 +93,16 @@ router.get(route, function (req, res, next) {
 });
 
 
-router.post(route, function (req, res, next) {
+router.post(route, __validate('post'), function (req, res, next) {
     // Query validation.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(httpError.BAD_REQUEST).json({ errors: errors.array() });
+        return;
+    }
     let userID = req.user.userID;
-    let friendsUserID = req.body.friendsID;
-
-    if (!userID || !friendsUserID) return res.sendStatus(httpError.BAD_REQUEST);
-
-    let errorMsg = '';
-    friendsUserID.forEach(function (objectID, index) {
-        if (friendsUserID.indexOf(objectID) !== -1 && friendsUserID.indexOf(objectID) !== index) {
-            errorMsg = 'Duplicate of users';
-            return new Error();
-        }
-    });
-    if (errorMsg) return res.status(httpError.BAD_REQUEST).json(errorMsg);
     if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
-    if (!friendsUserID || !Array.isArray(friendsUserID)) return res.sendStatus(httpError.BAD_REQUEST);
-    if (req.body.roomName && !(typeof req.body.roomName === 'string')) return res.sendStatus(httpError.BAD_REQUEST);
+    let friendsUserID = req.body.friendsID;
 
     // Answer request.
     friends.isInRelationWithUsers(userID, friendsUserID, function (err, isInRelation) {
@@ -77,22 +130,18 @@ router.post(route, function (req, res, next) {
 });
 
 
-router.patch(`${route}/:roomID`, function (req, res, next) {
+router.patch(`${route}/:roomID`, __validate('patch'), function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(httpError.BAD_REQUEST).json({ errors: errors.array() });
+        return;
+    }
     // Query Validation.
     let userID = req.user.userID;
+    if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
+
     let roomID = req.params.roomID;
     let friendsID = req.body.friendsID;
-
-    if (!roomID || !userID || !friendsID || !(friendsID instanceof Array)) return res.sendStatus(httpError.BAD_REQUEST);
-
-    let errorMsg = '';
-    friendsID.forEach(function (id, index) {
-        if (friendsID.indexOf(id) !== -1 && friendsID.indexOf(id) !== index) {
-            errorMsg = 'Duplicate of users';
-            return new Error();
-        }
-    });
-    if (errorMsg) return res.status(httpError.BAD_REQUEST).json(errorMsg);
 
     // Answer request.
     chatroom.isUserInRoom(userID, roomID, function (err, isInRoom) {
