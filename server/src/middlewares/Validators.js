@@ -68,20 +68,27 @@ let validator = function (req, res, next) {
 /**
  * Custom validatior for the registration route, all others routes shall call the default validator function.
  * @param {Object} req - req object from Express framework.
+ * @param {Object} res - res object from Express framework.
  * @param {Function} next - Callback function
  */
-let registrationValidator = function (req, next) {
+let registrationValidator = function (req, res, next) {
     let token = req.headers.g_token;
 
     if (token) {
-        GAuth.verify(token, function (userPayload) {
-            req.userPayload = userPayload;
+        GAuth.verify(token, function (payload) {
+            let userID = payload.sub;
+            req.user = {
+                userID: userID,
+                userPayload: payload,
+                registeredBy: 'GOOGLE'
+            };
             return next();
 
         }).catch(function (err) {
-            return next(401);
+            return next(httpError.UNAUTHORIZED);
         });
     } else {
+        req.user = {};
         return next();
     }
 

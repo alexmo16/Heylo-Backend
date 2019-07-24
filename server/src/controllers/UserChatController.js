@@ -75,7 +75,7 @@ router.get(route, __validate('get'), function (req, res, next) {
         return;
     }
     let userID = req.user.userID;
-    if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
+    if (!userID) return res.sendStatus(httpError.INTERNAL_SERVER_ERROR);
 
     users.findUserByID(userID, function (err, user) {
         if (err) return next(err);
@@ -138,7 +138,7 @@ router.patch(`${route}/:roomID`, __validate('patch'), function (req, res, next) 
     }
     // Query Validation.
     let userID = req.user.userID;
-    if (!userID) return res.sendStatus(httpError.BAD_REQUEST);
+    if (!userID) return res.sendStatus(httpError.INTERNAL_SERVER_ERROR);
 
     let roomID = req.params.roomID;
     let friendsID = req.body.friendsID;

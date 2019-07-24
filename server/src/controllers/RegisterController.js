@@ -2,11 +2,30 @@ let express = require('express');
 let router = express.Router();
 let uuidv4 = require('uuid/v4');
 let path = require('path');
+let { validationResult, body } = require('express-validator');
 
 let validators = require('../middlewares/Validators');
 let users = require('../services/users/users');
 let utils = require('../utils/Utils');
 let httpError = require('../utils/HttpError');
+
+/**
+ * Validate inputs for the RegisterController.
+ * @param {String} method methods name to validate inputs */
+let __validate = function (method) {
+    switch (method) {
+        case 'post': {
+            return [
+                body('email', 'Invalid body input').optional().normalizeEmail().isEmail(),
+                body('password', 'Invalid body input').optional().isString().trim().escape(),
+                body('username', 'Invalid body input').optional().isString().trim().escape(),
+                body('firstname', 'Invalid body input').optional().isString().trim().escape(),
+                body('lastname', 'Invalid body input').optional().isString().trim().escape(),
+            ];
+        }
+    }
+};
+
 
 router.get('/register', function (req, res, next) {
     res.sendFile(path.join(__dirname, '../../public', 'register.html'));
@@ -14,7 +33,13 @@ router.get('/register', function (req, res, next) {
 
 
 // create a new user
-router.post('/register', validators.registrationValidator, function (req, res, next) {
+router.post('/register', validators.registrationValidator, __validate('post'), function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(httpError.BAD_REQUEST).json({ errors: errors.array() });
+        return;
+    }
+
     let googleUserInfo = req.user.userPayload;
     if (googleUserInfo && (!googleUserInfo.family_name || !googleUserInfo.given_name || !googleUserInfo.sub)) return res.status(httpError.INTERNAL_SERVER_ERROR).json(`unable to get user's informations.`);
 
