@@ -21,6 +21,7 @@ let __validate = function (method) {
                 body('username', 'Invalid body input').optional().isString().trim().escape(),
                 body('firstname', 'Invalid body input').optional().isString().trim().escape(),
                 body('lastname', 'Invalid body input').optional().isString().trim().escape(),
+                body('phone', 'Invalid body input').exists().isMobilePhone()
             ];
         }
     }
@@ -53,7 +54,8 @@ router.post('/register', validators.registrationValidator, __validate('post'), f
         email: googleUserInfo ? googleUserInfo.email : req.body.email,
         firstname: googleUserInfo && googleUserInfo.given_name ? googleUserInfo.given_name : req.body.firstname,
         lastname: googleUserInfo && googleUserInfo.family_name ? googleUserInfo.family_name : req.body.lastname,
-        user_id: googleUserInfo && googleUserInfo.sub ? googleUserInfo.sub : uuidv4()
+        user_id: googleUserInfo && googleUserInfo.sub ? googleUserInfo.sub : uuidv4(),
+        phone: req.body.phone
     };
 
 
@@ -67,12 +69,18 @@ router.post('/register', validators.registrationValidator, __validate('post'), f
             firstName: newUser.firstname,
             lastName: newUser.lastname,
             email: newUser.email,
-            creation_date: newUser.creation_date
+            creation_date: newUser.creation_date,
+            phone: newUser.phone
         };
 
         // This mean the user used our password system, so we need to create our own jwt.
         if (newUser.password) {
-            responseData.jwt = utils.createToken({ email: newUser.email, user_id: newUser.user_id, ip: req.connection.remoteAddress });
+            responseData.jwt = utils.createToken({ 
+                email: newUser.email, 
+                user_id: newUser.user_id, 
+                phone: newUser.phone, 
+                ip: req.connection.remoteAddress 
+            });
         }
 
         return res.status(httpError.CREATED).json(responseData);
