@@ -20,7 +20,7 @@ Chat application back-end server. (Still in development)
 
         $ npm install
 
-7. Config folder and sslcert folder contains secrets, so there are not in the repo.
+7. Config folder and sslcert folder hold secrets, so there are not in the repo.
 
 8. Run server in development:
 
