@@ -1,6 +1,6 @@
 # Heylo
 
-Heylo is a mobile secure chat application, and this is the Back-End. (IN DEVELOPMENT)
+Chat application back-end server. (Still in development)
 
 ## Installation
 
@@ -20,7 +20,7 @@ Heylo is a mobile secure chat application, and this is the Back-End. (IN DEVELOP
 
         $ npm install
 
-7. Config folder and sslcert folder contain secrets, so there are not in the repo.
+7. Config folder and sslcert folder contains secrets, so there are not in the repo.
 
 8. Run server in development:
 
@@ -29,3 +29,7 @@ Heylo is a mobile secure chat application, and this is the Back-End. (IN DEVELOP
 9. Run server in debug (setup your IDE/Editor to execute this command when debugging):
 
         $ npm run debug
+
+8. Run server in production:
+
+        $ npm run prod
