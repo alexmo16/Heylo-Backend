@@ -9,7 +9,7 @@
     "debug": "node_modules/.bin/nodemon --inspect-brk=9229 ./bin/www"
   },
   "dependencies": {
-    "async": "^2.6.2",
+    "async": "^3.2.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
